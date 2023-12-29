@@ -2,8 +2,8 @@ package io.zinu.migaku.modules.profile.api
 
 import io.zinu.migaku.common.BaseResponse.Companion.success
 import io.zinu.migaku.common.baseRespond
-import io.zinu.migaku.modules.auth.dto.UpdateUserRequest
-import io.zinu.migaku.modules.auth.dto.UserResponse
+import io.zinu.migaku.modules.profile.dto.UpdateUserRequest
+import io.zinu.migaku.modules.profile.dto.UserResponse
 import io.zinu.migaku.modules.profile.service.IUserService
 import io.zinu.migaku.utils.Constants.JWT_AUTH
 import io.zinu.migaku.utils.userId
@@ -14,6 +14,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
+import io.zinu.migaku.utils.param
 import org.koin.ktor.ext.inject
 
 fun Route.user() {
@@ -24,6 +25,13 @@ fun Route.user() {
             get(getListUsersDoc) {
                 val users = userService.getAllUsers()
                 val response = users.map { UserResponse.fromUser(it) }
+                call.baseRespond(success(response))
+            }
+
+            get("/{userId}", getUserDoc) {
+                val userId = call.param("userId")
+                val user = userService.getUserById(userId)
+                val response = UserResponse.fromUser(user)
                 call.baseRespond(success(response))
             }
 

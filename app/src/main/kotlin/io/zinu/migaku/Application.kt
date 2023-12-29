@@ -2,10 +2,8 @@ package io.zinu.migaku
 
 import io.zinu.migaku.config.*
 import io.zinu.migaku.modules.auth.config.authKoinModule
-import io.zinu.migaku.modules.conversation.config.conversationKoinModule
 import io.zinu.migaku.modules.database.config.databaseKoinModule
 import io.zinu.migaku.modules.database.config.esKoinModule
-import io.zinu.migaku.modules.openai.config.openaiKoinModule
 import io.zinu.migaku.modules.profile.config.profileKoinModule
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.application.*
@@ -29,8 +27,6 @@ fun main(args: Array<String>) {
                     esKoinModule,
                     authKoinModule,
                     profileKoinModule,
-                    conversationKoinModule,
-                    openaiKoinModule
                 )
             }
         }

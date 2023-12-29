@@ -35,10 +35,4 @@ fun extractConfig(hoconConfig: HoconApplicationConfig) = config {
         }
     }
 
-    openai {
-        with(hoconConfig.config("openai")) {
-            token = property("token").getString()
-            model = property("model").getString()
-        }
-    }
 }

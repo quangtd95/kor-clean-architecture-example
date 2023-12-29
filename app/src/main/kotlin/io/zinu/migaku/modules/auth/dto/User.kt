@@ -27,43 +27,15 @@ data class LoginUserRequest(val user: LoginUserDto) {
     }
 }
 
-data class UpdateUserRequest(val user: UpdateUserDto) {
-    data class UpdateUserDto(
-        val email: String? = null,
-        val username: String? = null,
-        val password: String? = null,
-        val image: String? = null,
-        val bio: String? = null
-    )
-}
-
 data class RefreshTokenRequest(val refreshToken: String) {
     init {
         require(refreshToken.isNotBlank()) { "refreshToken cannot be blank" }
     }
 }
 
-data class UserResponse(val user: UserDto) {
-    data class UserDto(
-        val email: String,
-        val username: String,
-        val bio: String,
-        val image: String?,
-    )
-
-    companion object {
-        fun fromUser(
-            user: io.zinu.migaku.modules.auth.model.User,
-        ): UserResponse = UserResponse(
-            UserDto(
-                email = user.email, username = user.username, bio = user.bio, image = user.image
-            )
-        )
-    }
-}
-
 data class UserCredentialsResponse(val user: UserDto, val credentials: CredentialsDto) {
     data class UserDto(
+        val id: String,
         val email: String,
         val username: String,
         val bio: String,
@@ -81,7 +53,11 @@ data class UserCredentialsResponse(val user: UserDto, val credentials: Credentia
         fun fromUser(user: io.zinu.migaku.modules.auth.model.User, credentials: Credentials) =
             UserCredentialsResponse(
                 UserDto(
-                    email = user.email, username = user.username, bio = user.bio, image = user.image
+                    id = user.id.toString(),
+                    email = user.email,
+                    username = user.username,
+                    bio = user.bio,
+                    image = user.image
                 ), CredentialsDto(
                     accessToken = credentials.accessToken,
                     accessTokenExpiredTime = credentials.accessTokenExpiredTime.toString(),

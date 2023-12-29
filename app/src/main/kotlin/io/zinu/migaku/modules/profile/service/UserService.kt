@@ -1,7 +1,7 @@
 package io.zinu.migaku.modules.profile.service
 
 import io.zinu.migaku.common.BaseService
-import io.zinu.migaku.modules.auth.dto.UpdateUserRequest
+import io.zinu.migaku.modules.profile.dto.UpdateUserRequest
 import io.zinu.migaku.exception.UserDoesNotExistsException
 import io.zinu.migaku.modules.auth.model.*
 import java.util.*

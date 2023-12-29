@@ -4,8 +4,6 @@ import io.zinu.migaku.config.ApplicationConfig
 import io.zinu.migaku.modules.auth.model.Followings
 import io.zinu.migaku.modules.auth.model.RefreshTokens
 import io.zinu.migaku.modules.auth.model.Users
-import io.zinu.migaku.modules.conversation.model.ConversationMessages
-import io.zinu.migaku.modules.conversation.model.Conversations
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.*
@@ -24,14 +22,14 @@ interface IDatabaseProvider {
 }
 
 @OptIn(DelicateCoroutinesApi::class)
-class DatabaseProvider : io.zinu.migaku.modules.database.IDatabaseProvider, KoinComponent {
+class DatabaseProvider : IDatabaseProvider, KoinComponent {
     private val applicationConfig by inject<ApplicationConfig>()
     private val dispatcher: CoroutineDispatcher = newFixedThreadPoolContext(5, "database-pool")
 
     override fun init() {
         Database.connect(hikari())
         transaction {
-            create(Users, Followings, RefreshTokens, Conversations, ConversationMessages)
+            create(Users, Followings, RefreshTokens)
         }
     }
 
@@ -54,7 +52,7 @@ class DatabaseProvider : io.zinu.migaku.modules.database.IDatabaseProvider, Koin
     }
 
     override suspend fun drop() {
-        dbQuery { drop(Users, Followings, RefreshTokens, Conversations, ConversationMessages) }
+        dbQuery { drop(Users, Followings, RefreshTokens) }
     }
 
 }

@@ -6,15 +6,12 @@ import io.zinu.migaku.modules.database.config.DatabaseConfigBuilder
 import io.zinu.migaku.modules.database.config.DatabaseConfig
 import io.zinu.migaku.modules.database.config.ESConfig
 import io.zinu.migaku.modules.database.config.ESConfigBuilder
-import io.zinu.migaku.modules.openai.config.OpenAiConfig
-import io.zinu.migaku.modules.openai.config.OpenAiConfigBuilder
 
 data class ApplicationConfig(
     val serverConfig: ServerConfig,
     val jwtConfig: JwtConfig,
     val databaseConfig: DatabaseConfig,
     val esConfig: ESConfig,
-    val openAiConfig: OpenAiConfig,
 )
 
 class ApplicationConfigBuilder {
@@ -22,7 +19,6 @@ class ApplicationConfigBuilder {
     private lateinit var jwtConfig: JwtConfig
     private lateinit var databaseConfig: DatabaseConfig
     private lateinit var esConfig: ESConfig
-    private lateinit var openAiConfig: OpenAiConfig
 
     fun server(block: ServerConfigBuilder.() -> Unit) {
         serverConfig = ServerConfigBuilder().apply(block).build()
@@ -40,11 +36,8 @@ class ApplicationConfigBuilder {
         databaseConfig = DatabaseConfigBuilder().apply(block).build()
     }
 
-    fun openai(block: OpenAiConfigBuilder.() -> Unit) {
-        openAiConfig = OpenAiConfigBuilder().apply(block).build()
-    }
 
-    fun build(): ApplicationConfig = ApplicationConfig(serverConfig, jwtConfig, databaseConfig, esConfig, openAiConfig)
+    fun build(): ApplicationConfig = ApplicationConfig(serverConfig, jwtConfig, databaseConfig, esConfig)
 }
 
 data class ServerConfig(

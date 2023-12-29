@@ -4,8 +4,8 @@ import io.zinu.migaku.config.ApiDoc
 import io.zinu.migaku.config.SWAGGER_SECURITY_SCHEMA
 import io.zinu.migaku.config.TAG_USER
 import io.zinu.migaku.common.BaseResponse
-import io.zinu.migaku.modules.auth.dto.UpdateUserRequest
-import io.zinu.migaku.modules.auth.dto.UserResponse
+import io.zinu.migaku.modules.profile.dto.UpdateUserRequest
+import io.zinu.migaku.modules.profile.dto.UserResponse
 import io.ktor.http.*
 
 val usersDoc: ApiDoc = {
@@ -19,6 +19,20 @@ val getListUsersDoc: ApiDoc = {
         HttpStatusCode.OK to {
             class GetListUsersDocType : BaseResponse<List<UserResponse>>()
             body(GetListUsersDocType::class)
+        }
+    }
+}
+
+val getUserDoc: ApiDoc = {
+    description = "Get user by userId"
+
+    request {
+        pathParameter<String>("userId")
+    }
+    response {
+        HttpStatusCode.OK to {
+            class GetUserDocType : BaseResponse<UserResponse>()
+            body(GetUserDocType::class)
         }
     }
 }
