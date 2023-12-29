@@ -1,4 +1,4 @@
-package io.zinu.migaku.modules.profile.dto
+package io.zinu.migaku.user.dto
 
 data class UpdateUserRequest(val user: UpdateUserDto) {
     data class UpdateUserDto(
@@ -21,7 +21,7 @@ data class UserResponse(val user: UserDto) {
 
     companion object {
         fun fromUser(
-            user: io.zinu.migaku.modules.auth.model.User,
+            user: io.zinu.migaku.auth.model.User,
         ): UserResponse = UserResponse(
             UserDto(
                 id = user.id.toString(),
