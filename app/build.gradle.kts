@@ -19,7 +19,7 @@ group = AppConfig.GROUP
 version = AppConfig.VERSION
 
 application {
-    mainClass.set("com.qtd.ApplicationKt")
+    mainClass.set("io.zinu.migaku.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
