@@ -11,18 +11,7 @@ import Dependencies.Versions.POSTGRESQL_VERSION
 
 plugins {
     kotlin("jvm") version "1.9.21"
-    id("io.ktor.plugin") version "2.3.7"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
-}
-
-group = AppConfig.GROUP
-version = AppConfig.VERSION
-
-application {
-    mainClass.set("io.zinu.migaku.infra.ApplicationKt")
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
 repositories {
