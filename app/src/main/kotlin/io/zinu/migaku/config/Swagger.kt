@@ -8,8 +8,6 @@ import io.github.smiley4.ktorswaggerui.dsl.PluginConfigDsl
 const val SWAGGER_SECURITY_SCHEMA = "BearerJWTAuth"
 const val TAG_AUTH = "Auth"
 const val TAG_USER = "User"
-const val TAG_CONVERSATION = "Conversation"
-const val TAG_PROFILE = "Profile"
 typealias ApiDoc = OpenApiRoute.() -> Unit
 
 fun PluginConfigDsl.configSwagger() {
@@ -46,11 +44,5 @@ fun PluginConfigDsl.configSwagger() {
     }
     tag(TAG_USER) {
         description = "Operations about user"
-    }
-    tag(TAG_CONVERSATION) {
-        description = "Operations about conversation"
-    }
-    tag(TAG_PROFILE) {
-        description = "Operations about profile"
     }
 }
