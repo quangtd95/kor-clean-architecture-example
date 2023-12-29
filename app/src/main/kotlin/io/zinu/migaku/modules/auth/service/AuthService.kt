@@ -5,22 +5,19 @@ import io.zinu.migaku.exception.LoginCredentialsInvalidException
 import io.zinu.migaku.exception.RefreshTokenInvalidException
 import io.zinu.migaku.exception.UserDoesNotExistsException
 import io.zinu.migaku.exception.UserExistsException
+import io.zinu.migaku.modules.auth.dao.IRefreshTokenDao
+import io.zinu.migaku.modules.auth.dao.IUserDao
 import io.zinu.migaku.modules.auth.dto.RegisterUserRequest
 import io.zinu.migaku.modules.auth.dto.UserCredentialsResponse
-import io.zinu.migaku.modules.auth.model.IRefreshTokenDao
-import io.zinu.migaku.modules.auth.model.IUserDao
 import io.zinu.migaku.modules.auth.model.User
 import io.zinu.migaku.modules.auth.model.Users
 import io.zinu.migaku.utils.unless
 import org.koin.core.component.inject
-import java.util.*
 
 interface IAuthService {
     suspend fun register(registerUser: RegisterUserRequest): UserCredentialsResponse
     suspend fun login(email: String, password: String): UserCredentialsResponse
     suspend fun refresh(refreshToken: String): UserCredentialsResponse
-
-    suspend fun getUserById(id: String): User
     suspend fun logout(userId: String)
 }
 
@@ -47,7 +44,7 @@ class AuthService : BaseService(), IAuthService {
             password = passwordService.encryptPassword(registerUser.user.password)
         )
         val tokens = tokenService.createTokens(newUser)
-        refreshTokenDao.newRefreshToken(newUser.id.value, tokens.refreshToken, tokens.refreshTokenExpiredTime)
+        refreshTokenDao.newRefreshToken(newUser.id.toString(), tokens.refreshToken, tokens.refreshTokenExpiredTime)
 
         UserCredentialsResponse.fromUser(newUser, tokens)
     }
@@ -58,10 +55,10 @@ class AuthService : BaseService(), IAuthService {
 
         if (passwordService.validatePassword(password, user.password)) {
 
-            refreshTokenDao.revokeAllTokens(user.id.value)
+            refreshTokenDao.revokeAllTokens(user.id.toString())
 
             val tokens = tokenService.createTokens(user)
-            refreshTokenDao.newRefreshToken(user.id.value, tokens.refreshToken, tokens.refreshTokenExpiredTime)
+            refreshTokenDao.newRefreshToken(user.id.toString(), tokens.refreshToken, tokens.refreshTokenExpiredTime)
 
             UserCredentialsResponse.fromUser(user, tokens)
         } else {
@@ -94,7 +91,7 @@ class AuthService : BaseService(), IAuthService {
             dbQuery {
                 refreshTokenDao.deleteToken(refreshToken)
                 refreshTokenDao.newRefreshToken(
-                    user.id.value,
+                    user.id.toString(),
                     tokens.refreshToken,
                     tokens.refreshTokenExpiredTime,
                 )
@@ -107,13 +104,13 @@ class AuthService : BaseService(), IAuthService {
     }
 
 
-    override suspend fun getUserById(id: String) = dbQuery { getUser(id) }
+    private suspend fun getUserById(id: String) = dbQuery {
+        userDao.getByUserId(id) ?: throw UserDoesNotExistsException()
+    }
 
     override suspend fun logout(userId: String) {
         dbQuery {
-            refreshTokenDao.revokeAllTokens(UUID.fromString(userId))
+            refreshTokenDao.revokeAllTokens(userId)
         }
     }
 }
-
-fun getUser(id: String) = User.findById(UUID.fromString(id)) ?: throw UserDoesNotExistsException()

@@ -1,16 +1,18 @@
 package io.zinu.migaku.modules.database
 
-import io.zinu.migaku.config.ApplicationConfig
-import io.zinu.migaku.modules.auth.model.Followings
-import io.zinu.migaku.modules.auth.model.RefreshTokens
-import io.zinu.migaku.modules.auth.model.Users
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import kotlinx.coroutines.*
+import io.zinu.migaku.config.ApplicationConfig
+import io.zinu.migaku.modules.auth.model.RefreshTokens
+import io.zinu.migaku.modules.auth.model.Users
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SchemaUtils.drop
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -29,7 +31,7 @@ class DatabaseProvider : IDatabaseProvider, KoinComponent {
     override fun init() {
         Database.connect(hikari())
         transaction {
-            create(Users, Followings, RefreshTokens)
+            create(Users, RefreshTokens)
         }
     }
 
@@ -52,7 +54,7 @@ class DatabaseProvider : IDatabaseProvider, KoinComponent {
     }
 
     override suspend fun drop() {
-        dbQuery { drop(Users, Followings, RefreshTokens) }
+        dbQuery { drop(Users, RefreshTokens) }
     }
 
 }

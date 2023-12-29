@@ -27,7 +27,7 @@ import org.slf4j.event.Level
 fun Application.module() {
     val config: ApplicationConfig by inject()
     val tokenJWTVerifier: JWTVerifier by inject()
-    val databaseProvider: io.zinu.migaku.modules.database.IDatabaseProvider by inject()
+    val databaseProvider: IDatabaseProvider by inject()
     val esProvider: IESProvider by inject()
 
     databaseProvider.init()
