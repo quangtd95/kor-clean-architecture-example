@@ -1,4 +1,4 @@
-package io.zinu.migaku.auth.dao
+package io.zinu.migaku.auth.repository
 
 import io.zinu.migaku.auth.model.RefreshToken
 import io.zinu.migaku.auth.model.RefreshTokens
@@ -7,14 +7,14 @@ import org.jetbrains.exposed.sql.and
 import java.time.LocalDateTime
 import java.util.*
 
-interface IRefreshTokenDao {
+interface IRefreshTokenRepository {
     fun newRefreshToken(userId: String, token: String, expiredTime: LocalDateTime): RefreshToken
     fun verifyToken(token: String): Boolean
     fun revokeAllTokens(userId: String)
     fun deleteToken(token: String)
 }
 
-object RefreshTokenDao : IRefreshTokenDao {
+object RefreshTokenRepository : IRefreshTokenRepository {
     override fun newRefreshToken(userId: String, token: String, expiredTime: LocalDateTime) = RefreshToken.new {
         this.userId = UUID.fromString(userId)
         this.token = token

@@ -1,7 +1,7 @@
 package io.zinu.migaku.auth.service
 
-import io.zinu.migaku.auth.dao.IRefreshTokenDao
-import io.zinu.migaku.auth.dao.IUserDao
+import io.zinu.migaku.auth.repository.IRefreshTokenRepository
+import io.zinu.migaku.auth.repository.IUserRepository
 import io.zinu.migaku.auth.dto.RegisterUserRequest
 import io.zinu.migaku.auth.dto.UserCredentialsResponse
 import io.zinu.migaku.auth.model.User
@@ -24,8 +24,8 @@ interface IAuthService {
 class AuthService : BaseService(), IAuthService {
     private val passwordService by inject<IPasswordService>()
     private val tokenService by inject<ITokenService>()
-    private val refreshTokenDao by inject<IRefreshTokenDao>()
-    private val userDao by inject<IUserDao>()
+    private val refreshTokenDao by inject<IRefreshTokenRepository>()
+    private val userDao by inject<IUserRepository>()
 
     override suspend fun register(registerUser: RegisterUserRequest): UserCredentialsResponse = dbQuery {
         if (userDao.isExists(registerUser.user.email, registerUser.user.username)) {

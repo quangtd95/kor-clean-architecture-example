@@ -1,4 +1,4 @@
-package io.zinu.migaku.auth.dao
+package io.zinu.migaku.auth.repository
 
 import io.zinu.migaku.auth.model.User
 import io.zinu.migaku.auth.model.Users
@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.or
 import java.util.UUID
 
-interface IUserDao {
+interface IUserRepository {
     fun createNewUser(email: String, username: String, password: String): User
     fun isExists(email: String?, username: String?): Boolean
     fun getByUserId(userId: String): User?
@@ -15,7 +15,7 @@ interface IUserDao {
 //    fun updateUser(id: String, updateUser: UpdateUserRequest): User
 }
 
-object UserDao : IUserDao {
+object UserRepository : IUserRepository {
     override fun createNewUser(email: String, username: String, password: String) = User.new {
         this.username = username
         this.email = email

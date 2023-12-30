@@ -3,9 +3,11 @@ plugins {
     id("io.ktor.plugin") version "2.3.7"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
 }
+val appGroup: String by rootProject
+val appVersion: String by rootProject
 
-group = AppConfig.GROUP
-version = AppConfig.VERSION
+group = appGroup
+version = appVersion
 
 application {
     mainClass.set("io.zinu.migaku.infra.ApplicationKt")

@@ -1,6 +1,6 @@
 package io.zinu.migaku.user.service
 
-import io.zinu.migaku.auth.dao.IUserDao
+import io.zinu.migaku.auth.repository.IUserRepository
 import io.zinu.migaku.auth.model.User
 import io.zinu.migaku.common.base.BaseService
 import io.zinu.migaku.common.exception.UserDoesNotExistsException
@@ -8,22 +8,16 @@ import org.koin.core.component.inject
 
 interface IUserService {
     suspend fun getUserById(id: String): User
-
-    //    suspend fun updateUser(id: String, updateUser: UpdateUserRequest): User
     suspend fun getAllUsers(): List<User>
 }
 
 class UserService : BaseService(), IUserService {
-    private val userDao by inject<IUserDao>()
+    private val userRepository by inject<IUserRepository>()
 
     override suspend fun getUserById(id: String) = dbQuery {
-        userDao.getByUserId(id) ?: throw UserDoesNotExistsException()
+        userRepository.getByUserId(id) ?: throw UserDoesNotExistsException()
     }
 
-//    override suspend fun updateUser(id: String, updateUser: UpdateUserRequest) = dbQuery {
-//        userDao.updateUser(id, updateUser)
-//    }
-
-    override suspend fun getAllUsers() = dbQuery { userDao.getAllUsers() }
+    override suspend fun getAllUsers() = dbQuery { userRepository.getAllUsers() }
 }
 
