@@ -16,3 +16,7 @@ fun Application.userModule() {
         }
     }
 }
+
+fun preInitUserAdapterModule() {
+
+}

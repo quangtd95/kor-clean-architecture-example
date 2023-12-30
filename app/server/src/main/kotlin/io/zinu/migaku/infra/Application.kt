@@ -6,8 +6,7 @@ import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.zinu.migaku.auth.adapter.authAdapterKoinModule
-import io.zinu.migaku.auth.adapter.persist.postgres.entity.RefreshTokens
-import io.zinu.migaku.auth.adapter.persist.postgres.entity.Users
+import io.zinu.migaku.auth.adapter.preInitAuthAdapterModule
 import io.zinu.migaku.auth.core.authCoreKoinModule
 import io.zinu.migaku.common.adapter.commonAdapterKoinModule
 import io.zinu.migaku.common.adapter.database.IESProvider
@@ -15,10 +14,10 @@ import io.zinu.migaku.common.core.commonCoreKoinModule
 import io.zinu.migaku.common.core.database.BootPersistStoragePort
 import io.zinu.migaku.common.core.database.ShutdownPersistStoragePort
 import io.zinu.migaku.infra.config.loadServerConfig
+import io.zinu.migaku.user.adapter.preInitUserAdapterModule
 import io.zinu.migaku.user.adapter.userAdapterKoinModule
 import io.zinu.migaku.user.core.userCoreKoinModule
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.koin.core.logger.Level
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
@@ -65,7 +64,8 @@ fun main(args: Array<String>) {
         val bootPersistStoragePort by inject<BootPersistStoragePort>()
         runBlocking {
             bootPersistStoragePort.bootStorage {
-                SchemaUtils.create(Users, RefreshTokens)
+                preInitAuthAdapterModule()
+                preInitUserAdapterModule()
             }
         }
 
