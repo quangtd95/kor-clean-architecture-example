@@ -39,6 +39,8 @@ dependencies {
     api("io.ktor:ktor-server-host-common-jvm:$KTOR_VERSION")
     api("io.ktor:ktor-server-status-pages-jvm:$KTOR_VERSION")
     api("io.ktor:ktor-client-okhttp:$KTOR_VERSION")
+    api("io.ktor:ktor-server-call-id:$KTOR_VERSION")
+
 
     // ------------------------logback------------------------
     api("ch.qos.logback:logback-classic:$LOGBACK_VERSION")
