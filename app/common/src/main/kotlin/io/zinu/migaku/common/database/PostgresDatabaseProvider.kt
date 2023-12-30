@@ -1,25 +1,18 @@
-package io.zinu.migaku.auth.adapter.persist.postgres.repository
+package io.zinu.migaku.common.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.zinu.migaku.auth.adapter.persist.postgres.entity.RefreshTokens
-import io.zinu.migaku.auth.adapter.persist.postgres.entity.Users
-import io.zinu.migaku.auth.core.repository.BootPersistStoragePort
-import io.zinu.migaku.auth.core.repository.MustBeCalledInTransactionContext
-import io.zinu.migaku.auth.core.repository.PersistTransactionPort
-import io.zinu.migaku.auth.core.repository.ShutdownPersistStoragePort
 import io.zinu.migaku.common.config.CommonConfig
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.experimental.withSuspendTransaction
 import org.jetbrains.exposed.sql.transactions.transactionManager
 import org.slf4j.LoggerFactory
 
-internal class PostgresDatabaseProvider(
+class PostgresDatabaseProvider(
     private val commonConfig: CommonConfig
 ) :
     BootPersistStoragePort,
@@ -29,11 +22,6 @@ internal class PostgresDatabaseProvider(
     private lateinit var ds: HikariDataSource
     private lateinit var db: Database
 
-    private val tables = arrayOf(
-        Users,
-        RefreshTokens,
-    )
-
     override suspend fun <T> bootStorage(preInit: suspend () -> T) {
         logger.info("Initializing database...")
         ds = hikari()
@@ -41,7 +29,6 @@ internal class PostgresDatabaseProvider(
 
         withNewTransaction {
             preInit.invoke()
-            SchemaUtils.create(*tables)
         }
 
     }

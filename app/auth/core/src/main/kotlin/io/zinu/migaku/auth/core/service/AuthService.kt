@@ -3,7 +3,7 @@ package io.zinu.migaku.auth.core.service
 import io.zinu.migaku.auth.core.model.CoreUserCredential
 import io.zinu.migaku.auth.core.repository.RefreshTokenPort
 import io.zinu.migaku.auth.core.repository.UserPort
-import io.zinu.migaku.auth.core.repository.PersistTransactionPort
+import io.zinu.migaku.common.database.PersistTransactionPort
 import io.zinu.migaku.auth.core.usecase.AuthUsecase
 import io.zinu.migaku.auth.core.usecase.TokenUsecase
 import io.zinu.migaku.common.exception.LoginCredentialsInvalidException

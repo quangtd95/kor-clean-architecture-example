@@ -1,7 +1,7 @@
 package io.zinu.migaku.user.core.service
 
-import io.zinu.migaku.auth.core.repository.PersistTransactionPort
 import io.zinu.migaku.auth.core.repository.UserPort
+import io.zinu.migaku.common.database.PersistTransactionPort
 import io.zinu.migaku.common.exception.UserDoesNotExistsException
 import io.zinu.migaku.user.core.usecase.UserUsecase
 

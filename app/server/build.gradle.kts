@@ -28,6 +28,8 @@ repositories {
 
 dependencies {
     implementation(project(":app:common"))
-    implementation(project(":app:auth"))
-    implementation(project(":app:user"))
+    implementation(project(":app:auth:core"))
+    implementation(project(":app:auth:adapter"))
+    implementation(project(":app:user:core"))
+    implementation(project(":app:user:adapter"))
 }

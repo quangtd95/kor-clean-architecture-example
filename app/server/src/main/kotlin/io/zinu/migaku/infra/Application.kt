@@ -7,16 +7,19 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.zinu.migaku.auth.adapter.authAdapterKoinModule
 import io.zinu.migaku.auth.adapter.authModule
+import io.zinu.migaku.auth.adapter.persist.postgres.entity.RefreshTokens
+import io.zinu.migaku.auth.adapter.persist.postgres.entity.Users
 import io.zinu.migaku.auth.core.authCoreKoinModule
-import io.zinu.migaku.auth.core.repository.BootPersistStoragePort
-import io.zinu.migaku.auth.core.repository.ShutdownPersistStoragePort
+import io.zinu.migaku.common.commonKoinModule
 import io.zinu.migaku.common.config.loadCommonConfig
-import io.zinu.migaku.common.database.config.databaseKoinModule
-import io.zinu.migaku.common.database.config.esKoinModule
+import io.zinu.migaku.common.database.BootPersistStoragePort
+import io.zinu.migaku.common.database.IESProvider
+import io.zinu.migaku.common.database.ShutdownPersistStoragePort
 import io.zinu.migaku.user.adapter.userAdapterKoinModule
 import io.zinu.migaku.user.adapter.userModule
 import io.zinu.migaku.user.core.userCoreKoinModule
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.koin.core.logger.Level
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
@@ -40,8 +43,7 @@ fun main(args: Array<String>) {
                         single { hocon }
                         single { config }
                     },
-                    databaseKoinModule,
-                    esKoinModule,
+                    commonKoinModule,
                     authCoreKoinModule,
                     authAdapterKoinModule,
 
@@ -51,6 +53,9 @@ fun main(args: Array<String>) {
             }
         }
 
+        val esProvider: IESProvider by inject()
+        esProvider.init()
+
         val shutdownStoragePort = inject<ShutdownPersistStoragePort>().value
         environment.monitor.subscribe(ApplicationStopped) {
             logger.info("ktor server is being shutdown...")
@@ -59,7 +64,9 @@ fun main(args: Array<String>) {
 
         val bootPersistStoragePort by inject<BootPersistStoragePort>()
         runBlocking {
-            bootPersistStoragePort.bootStorage {}
+            bootPersistStoragePort.bootStorage {
+                SchemaUtils.create(Users, RefreshTokens)
+            }
         }
 
         main()

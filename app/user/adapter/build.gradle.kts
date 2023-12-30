@@ -15,6 +15,6 @@ repositories {
 
 dependencies {
     implementation(project(":app:common"))
-    implementation(project(":app:auth"))
+    implementation(project(":app:auth:core"))
     implementation(project(":app:user:core"))
 }

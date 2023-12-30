@@ -1,4 +1,4 @@
-package io.zinu.migaku.auth.core.repository
+package io.zinu.migaku.common.database
 
 interface BootPersistStoragePort {
     suspend fun <T> bootStorage(preInit: suspend () -> T)
