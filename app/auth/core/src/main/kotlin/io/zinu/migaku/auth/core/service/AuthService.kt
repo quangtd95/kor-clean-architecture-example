@@ -1,20 +1,21 @@
 package io.zinu.migaku.auth.core.service
 
 import io.zinu.migaku.auth.core.model.CoreUserCredential
+import io.zinu.migaku.auth.core.repository.PasswordCheckerPort
 import io.zinu.migaku.auth.core.repository.RefreshTokenPort
 import io.zinu.migaku.auth.core.repository.UserPort
-import io.zinu.migaku.common.database.PersistTransactionPort
 import io.zinu.migaku.auth.core.usecase.AuthUsecase
-import io.zinu.migaku.auth.core.usecase.TokenUsecase
-import io.zinu.migaku.common.exception.LoginCredentialsInvalidException
-import io.zinu.migaku.common.exception.RefreshTokenInvalidException
-import io.zinu.migaku.common.exception.UserDoesNotExistsException
-import io.zinu.migaku.common.exception.UserExistsException
-import io.zinu.migaku.common.utils.unless
+import io.zinu.migaku.auth.core.repository.TokenGeneratorPort
+import io.zinu.migaku.common.core.database.PersistTransactionPort
+import io.zinu.migaku.common.core.exception.LoginCredentialsInvalidException
+import io.zinu.migaku.common.core.exception.RefreshTokenInvalidException
+import io.zinu.migaku.common.core.exception.UserDoesNotExistsException
+import io.zinu.migaku.common.core.exception.UserExistsException
+import io.zinu.migaku.common.core.extension.unless
 
 class AuthService(
-    private val passwordService: IPasswordService,
-    private val tokenService: TokenUsecase,
+    private val passwordService: PasswordCheckerPort,
+    private val tokenService: TokenGeneratorPort,
     private val refreshTokenPort: RefreshTokenPort,
     private val userPort: UserPort,
     private val txPort: PersistTransactionPort,

@@ -6,17 +6,16 @@ import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.zinu.migaku.auth.adapter.authAdapterKoinModule
-import io.zinu.migaku.auth.adapter.authModule
 import io.zinu.migaku.auth.adapter.persist.postgres.entity.RefreshTokens
 import io.zinu.migaku.auth.adapter.persist.postgres.entity.Users
 import io.zinu.migaku.auth.core.authCoreKoinModule
-import io.zinu.migaku.common.commonKoinModule
-import io.zinu.migaku.common.config.loadCommonConfig
-import io.zinu.migaku.common.database.BootPersistStoragePort
-import io.zinu.migaku.common.database.IESProvider
-import io.zinu.migaku.common.database.ShutdownPersistStoragePort
+import io.zinu.migaku.common.adapter.commonAdapterKoinModule
+import io.zinu.migaku.common.adapter.database.IESProvider
+import io.zinu.migaku.common.core.commonCoreKoinModule
+import io.zinu.migaku.common.core.database.BootPersistStoragePort
+import io.zinu.migaku.common.core.database.ShutdownPersistStoragePort
+import io.zinu.migaku.infra.config.loadServerConfig
 import io.zinu.migaku.user.adapter.userAdapterKoinModule
-import io.zinu.migaku.user.adapter.userModule
 import io.zinu.migaku.user.core.userCoreKoinModule
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -29,11 +28,11 @@ import org.slf4j.LoggerFactory
 
 fun main(args: Array<String>) {
     val hocon = HoconApplicationConfig(ConfigFactory.load())
-    val config = loadCommonConfig(hocon)
+    val serverConfig = loadServerConfig(hocon)
     val logger = LoggerFactory.getLogger("Application")
 
-    embeddedServer(Netty, port = config.serverConfig.port) {
-        logger.info("Starting instance in port:${config.serverConfig.port}")
+    embeddedServer(Netty, port = serverConfig.port) {
+        logger.info("Starting instance in port:${serverConfig.port}")
 
         module {
             install(Koin) {
@@ -41,9 +40,10 @@ fun main(args: Array<String>) {
                 modules(
                     module {
                         single { hocon }
-                        single { config }
                     },
-                    commonKoinModule,
+                    commonCoreKoinModule,
+                    commonAdapterKoinModule,
+
                     authCoreKoinModule,
                     authAdapterKoinModule,
 
@@ -76,6 +76,5 @@ fun main(args: Array<String>) {
 
 fun Application.main() {
     module()
-    authModule()
-    userModule()
+
 }

@@ -13,6 +13,11 @@ repositories {
 
 }
 
+tasks.jar {
+    archiveBaseName.set("auth-core")
+}
+
 dependencies {
-    implementation(project(":app:common"))
+    implementation(project(":app:common:core"))
+
 }

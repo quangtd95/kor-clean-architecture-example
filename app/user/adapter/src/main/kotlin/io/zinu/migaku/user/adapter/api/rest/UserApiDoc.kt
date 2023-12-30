@@ -1,10 +1,10 @@
 package io.zinu.migaku.user.adapter.api.rest
 
 import io.ktor.http.*
-import io.zinu.migaku.common.base.BaseResponse
-import io.zinu.migaku.common.config.ApiDoc
-import io.zinu.migaku.common.config.SWAGGER_SECURITY_SCHEMA
-import io.zinu.migaku.common.config.TAG_USER
+import io.zinu.migaku.common.adapter.base.BaseResponse
+import io.zinu.migaku.common.adapter.config.ApiDoc
+import io.zinu.migaku.common.adapter.config.SWAGGER_SECURITY_SCHEMA
+import io.zinu.migaku.common.adapter.config.TAG_USER
 import io.zinu.migaku.user.adapter.api.dto.UserResponse
 
 val usersDoc: ApiDoc = {

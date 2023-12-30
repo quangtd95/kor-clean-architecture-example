@@ -5,10 +5,10 @@ import io.zinu.migaku.auth.adapter.api.dto.RefreshTokenRequest
 import io.zinu.migaku.auth.adapter.api.dto.RegisterUserRequest
 import io.zinu.migaku.auth.adapter.api.dto.UserCredentialsResponse
 import io.ktor.http.*
-import io.zinu.migaku.common.base.BaseResponse
-import io.zinu.migaku.common.config.ApiDoc
-import io.zinu.migaku.common.config.SWAGGER_SECURITY_SCHEMA
-import io.zinu.migaku.common.config.TAG_AUTH
+import io.zinu.migaku.common.adapter.base.BaseResponse
+import io.zinu.migaku.common.adapter.config.ApiDoc
+import io.zinu.migaku.common.adapter.config.SWAGGER_SECURITY_SCHEMA
+import io.zinu.migaku.common.adapter.config.TAG_AUTH
 
 
 val authDoc: ApiDoc = {

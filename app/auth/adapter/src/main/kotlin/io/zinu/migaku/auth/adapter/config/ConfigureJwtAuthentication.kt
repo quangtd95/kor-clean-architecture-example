@@ -6,8 +6,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.zinu.migaku.auth.core.config.JwtConfig
-import io.zinu.migaku.common.base.BaseResponse
-import io.zinu.migaku.common.utils.Constants.JWT_AUTH
+import io.zinu.migaku.common.adapter.base.BaseResponse
+import io.zinu.migaku.common.adapter.utils.Constants.JWT_AUTH
 
 fun AuthenticationConfig.configureJwtAuthentication(
     env: JwtConfig, tokenVerifier: JWTVerifier
