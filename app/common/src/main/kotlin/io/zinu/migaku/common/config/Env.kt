@@ -8,14 +8,12 @@ import io.zinu.migaku.common.database.config.ESConfigBuilder
 
 data class CommonConfig(
     val serverConfig: ServerConfig,
-    val jwtConfig: JwtConfig,
     val databaseConfig: DatabaseConfig,
     val esConfig: ESConfig,
 )
 
 class ApplicationConfigBuilder {
     private lateinit var serverConfig: ServerConfig
-    private lateinit var jwtConfig: JwtConfig
     private lateinit var databaseConfig: DatabaseConfig
     private lateinit var esConfig: ESConfig
 
@@ -23,9 +21,6 @@ class ApplicationConfigBuilder {
         serverConfig = ServerConfigBuilder().apply(block).build()
     }
 
-    fun jwt(block: JwtConfigBuilder.() -> Unit) {
-        jwtConfig = JwtConfigBuilder().apply(block).build()
-    }
 
     fun es(block: ESConfigBuilder.() -> Unit) {
         esConfig = ESConfigBuilder().apply(block).build()
@@ -36,7 +31,7 @@ class ApplicationConfigBuilder {
     }
 
 
-    fun build(): CommonConfig = CommonConfig(serverConfig, jwtConfig, databaseConfig, esConfig)
+    fun build(): CommonConfig = CommonConfig(serverConfig, databaseConfig, esConfig)
 }
 
 data class ServerConfig(
@@ -53,18 +48,9 @@ fun config(block: ApplicationConfigBuilder.() -> Unit): CommonConfig =
     ApplicationConfigBuilder().apply(block).build()
 
 
-fun extractConfig(hoconConfig: HoconApplicationConfig) = config {
+fun loadCommonConfig(hoconConfig: HoconApplicationConfig) = config {
     server {
         port = hoconConfig.config("ktor.deployment").property("port").getString().toInt()
-    }
-    jwt {
-        with(hoconConfig.config("jwt")) {
-            accessTokenSecretKey = property("accessTokenSecretKey").getString()
-            refreshTokenSecretKey = property("refreshTokenSecretKey").getString()
-            realm = property("realm").getString()
-            issuer = property("issuer").getString()
-            audience = property("audience").getString()
-        }
     }
     database {
         with(hoconConfig.config("database")) {

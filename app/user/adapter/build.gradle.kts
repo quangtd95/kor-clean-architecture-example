@@ -14,6 +14,7 @@ repositories {
 }
 
 dependencies {
-    api(project(":app:user:adapter"))
-    api(project(":app:user:core"))
+    implementation(project(":app:common"))
+    implementation(project(":app:auth"))
+    implementation(project(":app:user:core"))
 }
