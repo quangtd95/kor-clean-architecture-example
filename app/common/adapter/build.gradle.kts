@@ -11,7 +11,6 @@ val postgresqlVersion: String by rootProject
 
 plugins {
     id("common-conventions")
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
 }
 
 // set name of jar file output
