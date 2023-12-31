@@ -1,13 +1,5 @@
-val exposedVersion : String by rootProject
-val hikariCpVersion : String by rootProject
-val jbCryptVersion : String by rootProject
 val koinVersion : String by rootProject
-val ktorSwaggerUiVersion : String by rootProject
-val ktorVersion : String by rootProject
-val ktEsVersion : String by rootProject
 val logbackVersion : String by rootProject
-val openaiClientVersion : String by rootProject
-val postgresqlVersion : String by rootProject
 
 
 plugins {
