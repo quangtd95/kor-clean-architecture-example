@@ -8,15 +8,11 @@ import io.zinu.migaku.auth.adapter.api.rest.auth
 import io.zinu.migaku.auth.adapter.config.configureJwtAuthentication
 import io.zinu.migaku.auth.adapter.config.loadJwtConfig
 import io.zinu.migaku.auth.adapter.password.PasswordChecker
-import io.zinu.migaku.auth.adapter.persist.postgres.entity.RefreshTokens
-import io.zinu.migaku.auth.adapter.persist.postgres.entity.Users
 import io.zinu.migaku.auth.adapter.persist.postgres.repository.RefreshTokenRepository
 import io.zinu.migaku.auth.adapter.persist.postgres.repository.UserRepository
 import io.zinu.migaku.auth.adapter.token.TokenGenerator
 import io.zinu.migaku.auth.core.config.JwtConfig
 import io.zinu.migaku.auth.core.repository.*
-import io.zinu.migaku.auth.core.repository.TokenGeneratorPort
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 
@@ -27,8 +23,9 @@ val authAdapterKoinModule = module {
     single<PasswordCheckerPort> { PasswordChecker }
     single<TokenGeneratorPort> { TokenGenerator(get()) }
     single<UserPort> { UserRepository }
-    single<JWTVerifier> { (get<TokenGeneratorPort>() as TokenGenerator).getTokenVerifier() }
     single<RefreshTokenPort> { RefreshTokenRepository }
+    single<JWTVerifier> { (get<TokenGeneratorPort>() as TokenGenerator).getTokenVerifier() }
+
 
 }
 
@@ -47,6 +44,3 @@ fun Application.authModule() {
     }
 }
 
-fun preInitAuthAdapterModule() {
-    SchemaUtils.create(Users, RefreshTokens)
-}

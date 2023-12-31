@@ -4,9 +4,11 @@ import io.zinu.migaku.auth.adapter.persist.postgres.entity.User
 import io.zinu.migaku.auth.adapter.persist.postgres.entity.Users
 import io.zinu.migaku.auth.core.model.CoreUser
 import io.zinu.migaku.auth.core.repository.UserPort
+import org.jetbrains.exposed.sql.SchemaUtils
 import java.util.*
 
 object UserRepository : UserPort {
+
     override fun createNewUser(email: String, password: String) = User.new {
         this.email = email
         this.password = password

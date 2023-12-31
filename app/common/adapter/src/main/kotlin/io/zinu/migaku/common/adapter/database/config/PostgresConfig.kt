@@ -1,6 +1,6 @@
 package io.zinu.migaku.common.adapter.database.config
 
-data class DatabaseConfig(
+data class PostgresConfig(
     val driverClassName: String,
     val jdbcUrl: String,
     var username: String,
@@ -19,8 +19,8 @@ class DatabaseConfigBuilder {
     var isAutoCommit: Boolean = false
     var transactionIsolation: String = "TRANSACTION_REPEATABLE_READ"
 
-    fun build(): DatabaseConfig =
-        DatabaseConfig(
+    fun build(): PostgresConfig =
+        PostgresConfig(
             driverClassName,
             jdbcUrl,
             username,

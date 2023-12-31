@@ -21,14 +21,18 @@ import org.koin.dsl.module
 import org.slf4j.event.Level
 
 val commonAdapterKoinModule = module {
-    single { loadCommonConfig(hoconConfig = get()) }
+    single { loadPersistConfig(hoconConfig = get()) }
 
-    single { PostgresDatabaseProvider(commonConfig = get()) } binds arrayOf(
+    single {
+        when (get<PersistConfig>().persistType) {
+            PersistType.POSTGRES -> PostgresProvider(persistConfig = get())
+            PersistType.ES -> ElasticsearchProvider(persistConfig = get())
+        }
+    } binds arrayOf(
         BootPersistStoragePort::class,
         ShutdownPersistStoragePort::class,
         PersistTransactionPort::class
     )
-    single<IESProvider> { ESProvider() }
 }
 
 

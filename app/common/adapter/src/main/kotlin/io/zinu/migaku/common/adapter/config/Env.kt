@@ -1,32 +1,43 @@
 package io.zinu.migaku.common.adapter.config
 
-import io.zinu.migaku.common.adapter.database.config.DatabaseConfig
+import io.zinu.migaku.common.adapter.database.config.PostgresConfig
 import io.zinu.migaku.common.adapter.database.config.DatabaseConfigBuilder
 import io.zinu.migaku.common.adapter.database.config.ESConfig
 import io.zinu.migaku.common.adapter.database.config.ESConfigBuilder
+import java.util.*
 
-data class CommonConfig(
-    val databaseConfig: DatabaseConfig,
+enum class PersistType {
+    POSTGRES,
+    ES
+}
+
+data class PersistConfig(
+    val postgresConfig: PostgresConfig,
     val esConfig: ESConfig,
+    val persistType: PersistType = PersistType.POSTGRES
 )
 
 class ApplicationConfigBuilder {
-    private lateinit var databaseConfig: DatabaseConfig
+    private lateinit var postgresConfig: PostgresConfig
     private lateinit var esConfig: ESConfig
+    private lateinit var persistType: PersistType
 
 
     fun es(block: ESConfigBuilder.() -> Unit) {
         esConfig = ESConfigBuilder().apply(block).build()
     }
 
-    fun database(block: DatabaseConfigBuilder.() -> Unit) {
-        databaseConfig = DatabaseConfigBuilder().apply(block).build()
+    fun postgres(block: DatabaseConfigBuilder.() -> Unit) {
+        postgresConfig = DatabaseConfigBuilder().apply(block).build()
     }
 
+    fun persistType(block: () -> String) {
+        this.persistType = PersistType.valueOf(block().uppercase(Locale.getDefault()))
+    }
 
-    fun build(): CommonConfig = CommonConfig(databaseConfig, esConfig)
+    fun build(): PersistConfig = PersistConfig(postgresConfig, esConfig, persistType)
 }
 
-fun config(block: ApplicationConfigBuilder.() -> Unit): CommonConfig =
+fun config(block: ApplicationConfigBuilder.() -> Unit): PersistConfig =
     ApplicationConfigBuilder().apply(block).build()
 

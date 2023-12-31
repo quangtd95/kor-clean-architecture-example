@@ -2,7 +2,7 @@ package io.zinu.migaku.common.adapter.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.zinu.migaku.common.adapter.config.CommonConfig
+import io.zinu.migaku.common.adapter.config.PersistConfig
 import io.zinu.migaku.common.core.database.BootPersistStoragePort
 import io.zinu.migaku.common.core.database.MustBeCalledInTransactionContext
 import io.zinu.migaku.common.core.database.PersistTransactionPort
@@ -16,13 +16,13 @@ import org.jetbrains.exposed.sql.transactions.experimental.withSuspendTransactio
 import org.jetbrains.exposed.sql.transactions.transactionManager
 import org.slf4j.LoggerFactory
 
-class PostgresDatabaseProvider(
-    private val commonConfig: CommonConfig
+class PostgresProvider(
+    private val persistConfig: PersistConfig
 ) :
     BootPersistStoragePort,
     ShutdownPersistStoragePort,
     PersistTransactionPort {
-    private val logger = LoggerFactory.getLogger(PostgresDatabaseProvider::class.java)
+    private val logger = LoggerFactory.getLogger(PostgresProvider::class.java)
     private lateinit var ds: HikariDataSource
     private lateinit var db: Database
 
@@ -38,7 +38,7 @@ class PostgresDatabaseProvider(
     }
 
     private fun hikari(): HikariDataSource {
-        val dbConfig = commonConfig.databaseConfig
+        val dbConfig = persistConfig.postgresConfig
         HikariConfig().run {
             driverClassName = dbConfig.driverClassName
             jdbcUrl = dbConfig.jdbcUrl

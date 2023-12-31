@@ -3,9 +3,9 @@ package io.zinu.migaku.common.adapter.config
 import io.ktor.server.config.*
 
 
-fun loadCommonConfig(hoconConfig: HoconApplicationConfig) = config {
-    database {
-        with(hoconConfig.config("database")) {
+fun loadPersistConfig(hoconConfig: HoconApplicationConfig) = config {
+    with(hoconConfig.config("persist.postgres")) {
+        postgres {
             driverClassName = property("driverClassName").getString()
             jdbcUrl = property("jdbcUrl").getString()
             maximumPoolSize = property("maximumPoolSize").getString().toInt()
@@ -14,8 +14,13 @@ fun loadCommonConfig(hoconConfig: HoconApplicationConfig) = config {
         }
     }
 
-    es {
-        with(hoconConfig.config("es")) {
+    persistType {
+        hoconConfig.config("persist").property("persistType").getString()
+    }
+
+
+    with(hoconConfig.config("persist.es")) {
+        es {
             host = property("host").getString()
             port = property("port").getString().toInt()
             user = property("user").getString()
