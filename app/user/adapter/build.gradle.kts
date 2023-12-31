@@ -1,17 +1,7 @@
 plugins {
-    kotlin("jvm") version "1.9.21"
+    id("common-conventions")
 }
 
-
-repositories {
-    mavenCentral()
-    maven("https://maven.tryformation.com/releases") {
-        content {
-            includeGroup("com.jillesvangurp")
-        }
-    }
-
-}
 
 tasks.jar {
     archiveBaseName.set("user-adapter")

@@ -1,8 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.9.21"
+    id("common-conventions")
     id("io.ktor.plugin") version "2.3.7"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
 }
+
+
 val appGroup: String by rootProject
 val appVersion: String by rootProject
 
@@ -14,16 +16,6 @@ application {
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
-
-repositories {
-    mavenCentral()
-    maven("https://maven.tryformation.com/releases") {
-        content {
-            includeGroup("com.jillesvangurp")
-        }
-    }
-
 }
 
 dependencies {

@@ -11,19 +11,10 @@ val postgresqlVersion : String by rootProject
 
 
 plugins {
-    kotlin("jvm") version "1.9.21"
+    id("common-conventions")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.21"
 }
 
-repositories {
-    mavenCentral()
-    maven("https://maven.tryformation.com/releases") {
-        content {
-            includeGroup("com.jillesvangurp")
-        }
-    }
-
-}
 
 tasks.jar {
     archiveBaseName.set("common-core")
