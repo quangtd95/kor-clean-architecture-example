@@ -38,49 +38,56 @@ fun main(args: Array<String>) {
     embeddedServer(Netty, port = serverConfig.port) {
         logger.info("Starting instance in port:${serverConfig.port}")
 
-        module {
-            install(Koin) {
-                slf4jLogger(level = Level.INFO)
-                modules(
-                    module {
-                        single { hocon }
-                    },
-                    commonCoreKoinModule,
-                    commonAdapterKoinModule,
-
-                    authCoreKoinModule,
-                    authAdapterKoinModule,
-
-                    userCoreKoinModule,
-                    userAdapterKoinModule,
-                )
-            }
-        }
-
-        val shutdownStoragePort = inject<ShutdownPersistStoragePort>().value
-        environment.monitor.subscribe(ApplicationStopped) {
-            logger.info("ktor server is being shutdown...")
-            shutdownStoragePort.shutdownStorage()
-        }
-
-        val bootPersistStoragePort by inject<BootPersistStoragePort>()
-        runBlocking(Dispatchers.IO) {
-            bootPersistStoragePort.bootStorage {
-                val persistType = inject<PersistConfig>().value.persistType
-                when (persistType) {
-                    PersistType.POSTGRES -> {
-                        SchemaUtils.create(Users, RefreshTokens)
-                    }
-
-                    PersistType.ES -> {
-                        val esProvider = (inject<PersistTransactionPort>().value as ElasticsearchProvider)
-                        esProvider.createIndexIfNotExists("users", "refresh_tokens")
-                    }
-                }
-            }
-        }
-
+        installKoinModules { hocon }
+        bootstrapPersistStorage()
         module()
 
     }.start(wait = true)
+}
+
+private fun Application.installKoinModules(getHocon: () -> HoconApplicationConfig) {
+    module {
+        install(Koin) {
+            slf4jLogger(level = Level.INFO)
+            modules(
+                module {
+                    single { getHocon() }
+                },
+                commonCoreKoinModule,
+                commonAdapterKoinModule,
+
+                authCoreKoinModule,
+                authAdapterKoinModule,
+
+                userCoreKoinModule,
+                userAdapterKoinModule,
+            )
+        }
+    }
+}
+
+private fun Application.bootstrapPersistStorage() {
+    val logger = LoggerFactory.getLogger("Application")
+    val shutdownStoragePort = inject<ShutdownPersistStoragePort>().value
+    environment.monitor.subscribe(ApplicationStopped) {
+        logger.info("ktor server is being shutdown...")
+        shutdownStoragePort.shutdownStorage()
+    }
+
+    val bootPersistStoragePort by inject<BootPersistStoragePort>()
+    runBlocking(Dispatchers.IO) {
+        bootPersistStoragePort.bootStorage {
+            val persistType = inject<PersistConfig>().value.persistType
+            when (persistType) {
+                PersistType.POSTGRES -> {
+                    SchemaUtils.create(Users, RefreshTokens)
+                }
+
+                PersistType.ES -> {
+                    val esProvider = (inject<PersistTransactionPort>().value as ElasticsearchProvider)
+                    esProvider.createIndexIfNotExists("users", "refresh_tokens")
+                }
+            }
+        }
+    }
 }
