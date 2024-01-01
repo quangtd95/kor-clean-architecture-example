@@ -2,19 +2,19 @@ package io.zinu.migaku.auth.adapter.persist.es.document
 
 import com.jillesvangurp.searchdsls.mappingdsl.IndexSettingsAndMappingsDSL
 import io.zinu.migaku.auth.core.model.CoreRefreshToken
+import io.zinu.migaku.common.adapter.base.EsBaseIdDocument
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class EsRefreshTokens(
-    var id: String?,
     val token: String,
     val userId: String,
     val expiresAt: LocalDateTime,
     val createdAt: LocalDateTime,
     val revoked: Boolean,
-) {
+) : EsBaseIdDocument() {
 
 
     companion object {

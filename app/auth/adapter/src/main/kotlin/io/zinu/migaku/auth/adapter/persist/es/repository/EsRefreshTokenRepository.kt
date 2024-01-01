@@ -7,6 +7,7 @@ import io.zinu.migaku.auth.adapter.persist.es.document.EsRefreshTokens
 import io.zinu.migaku.auth.core.model.CoreRefreshToken
 import io.zinu.migaku.auth.core.repository.RefreshTokenPort
 import io.zinu.migaku.common.adapter.database.ElasticsearchProvider
+import io.zinu.migaku.common.adapter.database.parseHitsWithId
 import kotlinx.datetime.toKotlinLocalDateTime
 import java.time.LocalDateTime
 
@@ -14,7 +15,6 @@ class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) : 
 
     override suspend fun newRefreshToken(userId: String, token: String, expiredTime: LocalDateTime): CoreRefreshToken {
         val newEsRefreshToken = EsRefreshTokens(
-            id = null,
             token = token,
             userId = userId,
             expiresAt = expiredTime.toKotlinLocalDateTime(),
@@ -39,7 +39,7 @@ class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) : 
                 )
             }
         }
-        return result.parseHits<EsRefreshTokens>().isNotEmpty()
+        return result.parseHitsWithId<EsRefreshTokens>().isNotEmpty()
     }
 
     override suspend fun revokeAllTokens(userId: String) {
@@ -53,11 +53,8 @@ class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) : 
         }
 
         result
-            .parseHits<EsRefreshTokens>()
-            .zip(result.ids) { token, id ->
-                token.id = id
-                token
-            }.forEach {
+            .parseHitsWithId<EsRefreshTokens>()
+            .forEach {
                 esProvider.esClient.deleteDocument(
                     target = EsRefreshTokens.INDEX,
                     id = it.id!!
@@ -74,15 +71,12 @@ class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) : 
                 )
             }
         }
-        result.parseHits<EsRefreshTokens>()
-            .zip(result.ids) { esToken, id ->
-                esToken.id = id
-                esToken
-            }
+        result.parseHitsWithId<EsRefreshTokens>()
             .forEach {
                 esProvider.esClient.deleteDocument(
                     target = EsRefreshTokens.INDEX, id = it.id!!
                 )
             }
     }
+
 }

@@ -2,16 +2,16 @@ package io.zinu.migaku.auth.adapter.persist.es.document
 
 import com.jillesvangurp.searchdsls.mappingdsl.IndexSettingsAndMappingsDSL
 import io.zinu.migaku.auth.core.model.CoreUser
+import io.zinu.migaku.common.adapter.base.EsBaseIdDocument
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class EsUsers(
-    var id: String?,
     val email: String,
     val bio: String,
     val image: String,
     val password: String
-) {
+) : EsBaseIdDocument() {
     companion object {
         const val INDEX = "users"
 
