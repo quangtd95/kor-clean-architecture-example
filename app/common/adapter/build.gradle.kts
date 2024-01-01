@@ -19,7 +19,7 @@ tasks.jar {
 }
 
 dependencies {
-    implementation(project(":app:common:core"))
+    api(project(":app:common:core"))
     // ------------------------ktor------------------------
     api("io.ktor:ktor-server-core-jvm:$ktorVersion")
     api("io.ktor:ktor-server-resources:$ktorVersion")

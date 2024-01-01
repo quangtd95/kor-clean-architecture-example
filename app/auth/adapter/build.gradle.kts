@@ -10,8 +10,8 @@ tasks.jar {
 }
 
 dependencies {
-    implementation(project(":app:common"))
-    implementation(project(":app:auth:core"))
+    implementation(project(":app:common:adapter"))
+    api(project(":app:auth:core"))
 
     // ------------------------ktor------------------------
     api("io.ktor:ktor-server-auth-jvm:$ktorVersion")

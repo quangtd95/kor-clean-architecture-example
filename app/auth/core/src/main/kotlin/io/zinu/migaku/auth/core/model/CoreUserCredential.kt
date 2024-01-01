@@ -10,9 +10,9 @@ data class CoreUserCredential(
 data class CoreUser(
     val id: String,
     val email: String,
+    val password: String,
     val bio: String?,
     val image: String?,
-    val password: String,
 ) {
     companion object
 }

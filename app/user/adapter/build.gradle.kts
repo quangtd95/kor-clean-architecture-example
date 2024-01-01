@@ -8,8 +8,7 @@ tasks.jar {
 }
 
 dependencies {
-    implementation(project(":app:common"))
-    implementation(project(":app:auth:core"))
+    implementation(project(":app:common:adapter"))
     implementation(project(":app:auth:adapter"))
-    implementation(project(":app:user:core"))
+    api(project(":app:user:core"))
 }

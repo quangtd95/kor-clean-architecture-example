@@ -18,9 +18,7 @@ application {
 }
 
 dependencies {
-    implementation(project(":app:common"))
-    implementation(project(":app:auth:core"))
+    implementation(project(":app:common:adapter"))
     implementation(project(":app:auth:adapter"))
-    implementation(project(":app:user:core"))
     implementation(project(":app:user:adapter"))
 }
