@@ -17,6 +17,13 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
+ktor {
+    fatJar {
+        archiveFileName.set("server-all.jar")
+    }
+}
+
+
 dependencies {
     implementation(project(":app:common:adapter"))
     implementation(project(":app:auth:adapter"))

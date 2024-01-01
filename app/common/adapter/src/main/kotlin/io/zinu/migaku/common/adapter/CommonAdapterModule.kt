@@ -13,6 +13,7 @@ import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.statuspages.*
 import io.zinu.migaku.common.adapter.config.*
 import io.zinu.migaku.common.adapter.database.*
+import io.zinu.migaku.common.adapter.utils.DataTransformationBenchmarkPlugin
 import io.zinu.migaku.common.core.database.BootPersistStoragePort
 import io.zinu.migaku.common.core.database.PersistTransactionPort
 import io.zinu.migaku.common.core.database.ShutdownPersistStoragePort
@@ -68,4 +69,6 @@ fun Application.commonModule() {
     install(SwaggerUI) {
         configSwagger()
     }
+
+    install(DataTransformationBenchmarkPlugin)
 }
