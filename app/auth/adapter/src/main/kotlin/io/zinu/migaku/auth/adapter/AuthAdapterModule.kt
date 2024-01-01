@@ -8,11 +8,18 @@ import io.zinu.migaku.auth.adapter.api.rest.auth
 import io.zinu.migaku.auth.adapter.config.configureJwtAuthentication
 import io.zinu.migaku.auth.adapter.config.loadJwtConfig
 import io.zinu.migaku.auth.adapter.password.PasswordChecker
-import io.zinu.migaku.auth.adapter.persist.postgres.repository.RefreshTokenRepository
-import io.zinu.migaku.auth.adapter.persist.postgres.repository.UserRepository
+import io.zinu.migaku.auth.adapter.persist.es.document.EsRefreshTokens
+import io.zinu.migaku.auth.adapter.persist.es.repository.EsRefreshTokenRepository
+import io.zinu.migaku.auth.adapter.persist.es.repository.EsUserRepository
+import io.zinu.migaku.auth.adapter.persist.postgres.repository.PgRefreshTokenRepository
+import io.zinu.migaku.auth.adapter.persist.postgres.repository.PgUserRepository
 import io.zinu.migaku.auth.adapter.token.TokenGenerator
 import io.zinu.migaku.auth.core.config.JwtConfig
 import io.zinu.migaku.auth.core.repository.*
+import io.zinu.migaku.common.adapter.config.PersistConfig
+import io.zinu.migaku.common.adapter.config.PersistType
+import io.zinu.migaku.common.adapter.database.ElasticsearchProvider
+import io.zinu.migaku.common.core.database.PersistTransactionPort
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 
@@ -22,11 +29,21 @@ val authAdapterKoinModule = module {
     }
     single<PasswordCheckerPort> { PasswordChecker }
     single<TokenGeneratorPort> { TokenGenerator(get()) }
-    single<UserPort> { UserRepository }
-    single<RefreshTokenPort> { RefreshTokenRepository }
     single<JWTVerifier> { (get<TokenGeneratorPort>() as TokenGenerator).getTokenVerifier() }
-
-
+    single<UserPort> {
+        when (get<PersistConfig>().persistType) {
+            PersistType.POSTGRES -> PgUserRepository
+            PersistType.ES -> EsUserRepository(get<PersistTransactionPort>() as ElasticsearchProvider)
+        }
+    }
+    single<RefreshTokenPort> {
+        when (get<PersistConfig>().persistType) {
+            PersistType.POSTGRES -> PgRefreshTokenRepository
+            PersistType.ES -> {
+                EsRefreshTokenRepository(get<PersistTransactionPort>() as ElasticsearchProvider)
+            }
+        }
+    }
 }
 
 fun Application.authModule() {

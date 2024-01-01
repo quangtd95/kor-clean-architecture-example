@@ -4,3 +4,7 @@ package io.zinu.migaku.common.core.extension
 inline fun unless(condition: Boolean, block: () -> Unit) {
     if (condition.not()) block()
 }
+
+fun randomUUID(): String {
+    return java.util.UUID.randomUUID().toString()
+}

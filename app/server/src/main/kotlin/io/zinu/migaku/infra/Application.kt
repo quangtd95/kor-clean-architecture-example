@@ -6,8 +6,10 @@ import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.zinu.migaku.auth.adapter.authAdapterKoinModule
-import io.zinu.migaku.auth.adapter.persist.postgres.entity.RefreshTokens
-import io.zinu.migaku.auth.adapter.persist.postgres.entity.Users
+import io.zinu.migaku.auth.adapter.persist.es.document.EsRefreshTokens
+import io.zinu.migaku.auth.adapter.persist.es.document.EsUsers
+import io.zinu.migaku.auth.adapter.persist.postgres.entity.PgRefreshTokens
+import io.zinu.migaku.auth.adapter.persist.postgres.entity.PgUsers
 import io.zinu.migaku.auth.core.authCoreKoinModule
 import io.zinu.migaku.common.adapter.commonAdapterKoinModule
 import io.zinu.migaku.common.adapter.config.PersistConfig
@@ -80,12 +82,12 @@ private fun Application.bootstrapPersistStorage() {
             val persistType = inject<PersistConfig>().value.persistType
             when (persistType) {
                 PersistType.POSTGRES -> {
-                    SchemaUtils.create(Users, RefreshTokens)
+                    SchemaUtils.create(PgUsers, PgRefreshTokens)
                 }
 
                 PersistType.ES -> {
                     val esProvider = (inject<PersistTransactionPort>().value as ElasticsearchProvider)
-                    esProvider.createIndexIfNotExists("users", "refresh_tokens")
+                    esProvider.createIndexIfNotExists(EsUsers.INDEX, EsRefreshTokens.INDEX)
                 }
             }
         }

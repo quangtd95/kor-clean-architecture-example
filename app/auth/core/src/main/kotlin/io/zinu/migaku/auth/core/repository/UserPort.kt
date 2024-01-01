@@ -4,10 +4,10 @@ import io.zinu.migaku.auth.core.model.CoreUser
 
 
 interface UserPort {
-    fun createNewUser(email: String, password: String): CoreUser
-    fun isExists(email: String): Boolean
-    fun getByUserId(userId: String): CoreUser?
-    fun getByEmail(email: String): CoreUser?
-    fun getAllUsers(): List<CoreUser>
+    suspend fun createNewUser(email: String, password: String): CoreUser
+    suspend fun isExists(email: String): Boolean
+    suspend fun getByUserId(userId: String): CoreUser?
+    suspend fun getByEmail(email: String): CoreUser?
+    suspend fun getAllUsers(): List<CoreUser>
 }
 

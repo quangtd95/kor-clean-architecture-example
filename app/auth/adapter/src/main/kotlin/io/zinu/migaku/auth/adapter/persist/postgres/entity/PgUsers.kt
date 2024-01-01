@@ -7,7 +7,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.UUIDTable
 import java.util.*
 
-object Users : UUIDTable() {
+object PgUsers : UUIDTable("users") {
     val email = varchar("email", 255).uniqueIndex()
     val bio = text("bio").default("")
     val image = varchar("image", 255).nullable()
@@ -15,23 +15,21 @@ object Users : UUIDTable() {
 
 }
 
-class User(id: EntityID<UUID>) : UUIDEntity(id) {
-    companion object : UUIDEntityClass<User>(Users)
+class PgUser(id: EntityID<UUID>) : UUIDEntity(id) {
+    companion object : UUIDEntityClass<PgUser>(PgUsers)
 
-    var email by Users.email
-    var bio by Users.bio
-    var image by Users.image
-    var password by Users.password
+    var email by PgUsers.email
+    var bio by PgUsers.bio
+    var image by PgUsers.image
+    var password by PgUsers.password
 
-    fun toCore(): CoreUser {
-        return CoreUser(
-            id = id.toString(),
-            email = email,
-            image = image,
-            bio = bio,
-            password = password
-        )
-    }
+    fun toCore() = CoreUser(
+        id = id.toString(),
+        email = email,
+        image = image,
+        bio = bio,
+        password = password
+    )
 }
 
 

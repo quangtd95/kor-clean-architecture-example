@@ -19,7 +19,7 @@ val DataTransformationBenchmarkPlugin = createApplicationPlugin(name = "DataTran
         logger.info("onCallReceive in (ms): ${onCallReceiveTime - onCallTime}")
     }
 
-    onCallRespond { call->
+    onCallRespond { call ->
         val onCallTime = call.attributes[onCallTimeKey]
         val onCallReceiveTime = System.currentTimeMillis()
         logger.info("onCallRespond in (ms): ${onCallReceiveTime - onCallTime}")

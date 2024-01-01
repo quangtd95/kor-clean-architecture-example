@@ -46,9 +46,7 @@ class ElasticsearchProvider(persistConfig: PersistConfig) :
             )
         )
 
-        unless(esClient.exists("ktor")) {
-            esClient.createIndex("ktor")
-        }
+        preInit.invoke()
     }
 
     override fun shutdownStorage() {
