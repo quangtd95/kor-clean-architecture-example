@@ -1,4 +1,4 @@
-rootProject.name = "make-poc-be"
+rootProject.name = "fun-gpt-ktor-clean-architecture"
 
 include(":app:common:adapter")
 include(":app:common:core")
