@@ -1,25 +1,20 @@
 package io.zinu.migaku.auth.adapter.persist.es.repository
 
-import com.jillesvangurp.ktsearch.deleteDocument
-import com.jillesvangurp.ktsearch.indexDocument
-import com.jillesvangurp.ktsearch.parseHits
-import com.jillesvangurp.ktsearch.search
+import com.jillesvangurp.ktsearch.*
 import com.jillesvangurp.searchdsls.querydsl.bool
 import com.jillesvangurp.searchdsls.querydsl.term
 import io.zinu.migaku.auth.adapter.persist.es.document.EsRefreshTokens
 import io.zinu.migaku.auth.core.model.CoreRefreshToken
 import io.zinu.migaku.auth.core.repository.RefreshTokenPort
 import io.zinu.migaku.common.adapter.database.ElasticsearchProvider
-import io.zinu.migaku.common.core.extension.randomUUID
 import kotlinx.datetime.toKotlinLocalDateTime
 import java.time.LocalDateTime
 
-class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) :
-    RefreshTokenPort {
+class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) : RefreshTokenPort {
 
     override suspend fun newRefreshToken(userId: String, token: String, expiredTime: LocalDateTime): CoreRefreshToken {
         val newEsRefreshToken = EsRefreshTokens(
-            id = randomUUID(),
+            id = null,
             token = token,
             userId = userId,
             expiresAt = expiredTime.toKotlinLocalDateTime(),
@@ -27,10 +22,10 @@ class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) :
             revoked = false,
         )
 
-        //TODO: validate error
-        esProvider.esClient.indexDocument(
+        val indexResponse = esProvider.esClient.indexDocument(
             target = EsRefreshTokens.INDEX, document = newEsRefreshToken
         )
+        newEsRefreshToken.id = indexResponse.id
 
         return newEsRefreshToken.toCore()
     }
@@ -51,30 +46,43 @@ class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) :
         val result = esProvider.esClient.search(target = EsRefreshTokens.INDEX) {
             query = bool {
                 must(
-                    term("id.keyword", userId),
+                    term("userId.keyword", userId),
                     term("revoked.keyword", "false"),
                 )
             }
         }
-        result.parseHits<EsRefreshTokens>().forEach {
-            esProvider.esClient.indexDocument(
-                target = EsRefreshTokens.INDEX, document = it.copy(revoked = true)
-            )
-        }
+
+        result
+            .parseHits<EsRefreshTokens>()
+            .zip(result.ids) { token, id ->
+                token.id = id
+                token
+            }.forEach {
+                esProvider.esClient.deleteDocument(
+                    target = EsRefreshTokens.INDEX,
+                    id = it.id!!
+                )
+            }
     }
 
     override suspend fun deleteToken(token: String) {
         val result = esProvider.esClient.search(target = EsRefreshTokens.INDEX) {
             query = bool {
                 must(
-                    term("revoked.keyword", token),
+                    term("token.keyword", token),
+                    term("revoked.keyword", "false"),
                 )
             }
         }
-        result.parseHits<EsRefreshTokens>().forEach {
-            esProvider.esClient.deleteDocument(
-                target = EsRefreshTokens.INDEX, id = it.id
-            )
-        }
+        result.parseHits<EsRefreshTokens>()
+            .zip(result.ids) { esToken, id ->
+                esToken.id = id
+                esToken
+            }
+            .forEach {
+                esProvider.esClient.deleteDocument(
+                    target = EsRefreshTokens.INDEX, id = it.id!!
+                )
+            }
     }
 }

@@ -9,6 +9,7 @@ import io.zinu.migaku.auth.adapter.config.configureJwtAuthentication
 import io.zinu.migaku.auth.adapter.config.loadJwtConfig
 import io.zinu.migaku.auth.adapter.password.PasswordChecker
 import io.zinu.migaku.auth.adapter.persist.es.document.EsRefreshTokens
+import io.zinu.migaku.auth.adapter.persist.es.document.EsUsers
 import io.zinu.migaku.auth.adapter.persist.es.repository.EsRefreshTokenRepository
 import io.zinu.migaku.auth.adapter.persist.es.repository.EsUserRepository
 import io.zinu.migaku.auth.adapter.persist.postgres.repository.PgRefreshTokenRepository
@@ -19,6 +20,7 @@ import io.zinu.migaku.auth.core.repository.*
 import io.zinu.migaku.common.adapter.config.PersistConfig
 import io.zinu.migaku.common.adapter.config.PersistType
 import io.zinu.migaku.common.adapter.database.ElasticsearchProvider
+import io.zinu.migaku.common.adapter.database.ElasticsearchProvider.IndexCreation
 import io.zinu.migaku.common.core.database.PersistTransactionPort
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
@@ -59,5 +61,15 @@ fun Application.authModule() {
             auth()
         }
     }
+}
+
+suspend fun preInitEsRepoAuthModule(esProvider: ElasticsearchProvider) {
+    esProvider.createIndexIfNotExists(
+        IndexCreation(
+            index = EsUsers.INDEX, mappings = EsUsers.MAPPING
+        ), IndexCreation(
+            index = EsRefreshTokens.INDEX, mappings = EsRefreshTokens.MAPPING
+        )
+    )
 }
 

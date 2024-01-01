@@ -4,6 +4,7 @@ import com.jillesvangurp.ktsearch.KtorRestClient
 import com.jillesvangurp.ktsearch.SearchClient
 import com.jillesvangurp.ktsearch.createIndex
 import com.jillesvangurp.ktsearch.exists
+import com.jillesvangurp.searchdsls.mappingdsl.IndexSettingsAndMappingsDSL
 import io.zinu.migaku.common.adapter.config.PersistConfig
 import io.zinu.migaku.common.core.database.BootPersistStoragePort
 import io.zinu.migaku.common.core.database.MustBeCalledInTransactionContext
@@ -57,10 +58,15 @@ class ElasticsearchProvider(persistConfig: PersistConfig) :
         }
     }
 
-    suspend fun createIndexIfNotExists(vararg index: String) {
-        index.forEach {
-            unless(esClient.exists(it)) {
-                esClient.createIndex(it)
+    data class IndexCreation(
+        val index: String,
+        val mappings: IndexSettingsAndMappingsDSL,
+    )
+
+    suspend fun createIndexIfNotExists(vararg indexCreation: IndexCreation) {
+        indexCreation.forEach {
+            unless(esClient.exists(it.index)) {
+                esClient.createIndex(it.index, it.mappings)
             }
         }
     }

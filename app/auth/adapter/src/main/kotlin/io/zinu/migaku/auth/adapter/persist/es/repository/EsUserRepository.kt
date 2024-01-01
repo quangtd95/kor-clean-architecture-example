@@ -1,5 +1,6 @@
 package io.zinu.migaku.auth.adapter.persist.es.repository
 
+import com.jillesvangurp.ktsearch.ids
 import com.jillesvangurp.ktsearch.indexDocument
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.search
@@ -9,12 +10,11 @@ import io.zinu.migaku.auth.adapter.persist.es.document.EsUsers
 import io.zinu.migaku.auth.core.model.CoreUser
 import io.zinu.migaku.auth.core.repository.UserPort
 import io.zinu.migaku.common.adapter.database.ElasticsearchProvider
-import io.zinu.migaku.common.core.extension.randomUUID
 
 class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort {
     override suspend fun createNewUser(email: String, password: String): CoreUser {
         val newEsUser = EsUsers(
-            id = randomUUID(),
+            id = null,
             email = email,
             password = password,
             bio = "",
@@ -22,9 +22,10 @@ class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort
         )
 
         //TODO: validate error
-        esProvider.esClient.indexDocument(
+        val indexResponse = esProvider.esClient.indexDocument(
             target = EsUsers.INDEX, document = newEsUser
         )
+        newEsUser.id = indexResponse.id
 
         return newEsUser.toCore()
 
@@ -45,11 +46,13 @@ class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort
         val result = esProvider.esClient.search(target = EsUsers.INDEX) {
             query = bool {
                 must(
-                    term("id.keyword", userId)
+                    term("_id", userId)
                 )
             }
         }
-        return result.parseHits<EsUsers>().firstOrNull()?.toCore()
+        return result.parseHits<EsUsers>().firstOrNull()?.apply {
+            this.id = result.ids.first()
+        }?.toCore()
     }
 
     override suspend fun getByEmail(email: String): CoreUser? {
@@ -60,17 +63,23 @@ class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort
                 )
             }
         }
-        return result.parseHits<EsUsers>().firstOrNull()?.toCore()
+        return result.parseHits<EsUsers>().firstOrNull()?.apply {
+            this.id = result.ids.first()
+        }?.toCore()
     }
 
     override suspend fun getAllUsers(): List<CoreUser> {
         val result = esProvider.esClient.search(target = EsUsers.INDEX) {
             query = bool {
                 must(
-                    term("id.keyword", "*")
+                    term("_id", "*")
                 )
             }
         }
-        return result.parseHits<EsUsers>().map(EsUsers::toCore)
+        return result.parseHits<EsUsers>()
+            .zip(result.ids) { esUser, id ->
+                esUser.id = id
+                esUser
+            }.map(EsUsers::toCore)
     }
 }
