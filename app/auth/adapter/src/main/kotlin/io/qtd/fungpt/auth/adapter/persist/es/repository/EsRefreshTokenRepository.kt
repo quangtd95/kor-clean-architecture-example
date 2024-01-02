@@ -7,14 +7,16 @@ import io.qtd.fungpt.auth.adapter.persist.es.document.EsRefreshTokens
 import io.qtd.fungpt.auth.core.model.CoreRefreshToken
 import io.qtd.fungpt.auth.core.repository.RefreshTokenPort
 import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
-import io.qtd.fungpt.common.adapter.database.parseHitsWithId
+import io.qtd.fungpt.common.core.extension.randomUUID
 import kotlinx.datetime.toKotlinLocalDateTime
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) : RefreshTokenPort {
-
+    private val logger = LoggerFactory.getLogger(EsRefreshTokenRepository::class.java)
     override suspend fun newRefreshToken(userId: String, token: String, expiredTime: LocalDateTime): CoreRefreshToken {
         val newEsRefreshToken = EsRefreshTokens(
+            id = randomUUID(),
             token = token,
             userId = userId,
             expiresAt = expiredTime.toKotlinLocalDateTime(),
@@ -25,7 +27,7 @@ class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) : 
         val indexResponse = esProvider.esClient.indexDocument(
             target = EsRefreshTokens.INDEX, document = newEsRefreshToken
         )
-        newEsRefreshToken.id = indexResponse.id
+        logger.info("Create new refresh token with id: ${indexResponse.id}")
 
         return newEsRefreshToken.toCore()
     }
@@ -34,49 +36,24 @@ class EsRefreshTokenRepository(private val esProvider: ElasticsearchProvider) : 
         val result = esProvider.esClient.search(target = EsRefreshTokens.INDEX) {
             query = bool {
                 must(
-                    term("token.keyword", token),
-                    term("revoked.keyword", "false"),
+                    term(EsRefreshTokens::token, token),
+                    term(EsRefreshTokens::revoked, false.toString()),
                 )
             }
         }
-        return result.parseHitsWithId<EsRefreshTokens>().isNotEmpty()
+        return result.parseHits<EsRefreshTokens>().isNotEmpty()
     }
 
     override suspend fun revokeAllTokens(userId: String) {
-        val result = esProvider.esClient.search(target = EsRefreshTokens.INDEX) {
-            query = bool {
-                must(
-                    term("userId.keyword", userId),
-                    term("revoked.keyword", "false"),
-                )
-            }
+        esProvider.esClient.deleteByQuery(target = EsRefreshTokens.INDEX) {
+            query = term(EsRefreshTokens::userId, userId)
         }
-
-        result
-            .parseHitsWithId<EsRefreshTokens>()
-            .forEach {
-                esProvider.esClient.deleteDocument(
-                    target = EsRefreshTokens.INDEX,
-                    id = it.id!!
-                )
-            }
     }
 
     override suspend fun deleteToken(token: String) {
-        val result = esProvider.esClient.search(target = EsRefreshTokens.INDEX) {
-            query = bool {
-                must(
-                    term("token.keyword", token),
-                    term("revoked.keyword", "false"),
-                )
-            }
+        esProvider.esClient.deleteByQuery(target = EsRefreshTokens.INDEX) {
+            query = term(EsRefreshTokens::token, token)
         }
-        result.parseHitsWithId<EsRefreshTokens>()
-            .forEach {
-                esProvider.esClient.deleteDocument(
-                    target = EsRefreshTokens.INDEX, id = it.id!!
-                )
-            }
     }
 
 }

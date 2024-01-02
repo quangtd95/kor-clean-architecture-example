@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EsUsers(
+    val id: String,
     val email: String,
     val bio: String,
     val image: String,
@@ -16,15 +17,12 @@ data class EsUsers(
         const val INDEX = "users"
 
         val MAPPING = IndexSettingsAndMappingsDSL().apply {
-            mappings(dynamicEnabled = false) {
-                text(EsUsers::email) {
-                    fields {
-                        keyword("keyword")
-                    }
-                }
+            mappings(dynamicEnabled = true) {
+                keyword(EsUsers::id)
+                keyword(EsUsers::email)
                 text(EsUsers::bio)
                 text(EsUsers::image)
-                text(EsUsers::password)
+                keyword(EsUsers::password)
             }
         }
 
@@ -32,7 +30,7 @@ data class EsUsers(
 
     fun toCore(): CoreUser {
         return CoreUser(
-            id = id!!, email = email, image = image, bio = bio, password = password
+            id = id, email = email, image = image, bio = bio, password = password
         )
     }
 }

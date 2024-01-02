@@ -1,8 +1,10 @@
 package io.qtd.fungpt.common.adapter.database
 
-import com.jillesvangurp.ktsearch.*
+import com.jillesvangurp.ktsearch.KtorRestClient
+import com.jillesvangurp.ktsearch.SearchClient
+import com.jillesvangurp.ktsearch.createIndex
+import com.jillesvangurp.ktsearch.exists
 import com.jillesvangurp.searchdsls.mappingdsl.IndexSettingsAndMappingsDSL
-import io.qtd.fungpt.common.adapter.base.EsBaseIdDocument
 import io.qtd.fungpt.common.adapter.config.PersistConfig
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.MustBeCalledInTransactionContext
@@ -71,8 +73,3 @@ class ElasticsearchProvider(persistConfig: PersistConfig) :
 
 }
 
-inline fun <reified T : EsBaseIdDocument> SearchResponse.parseHitsWithId() =
-    this.parseHits<T>().zip(this.ids) { hit, id ->
-        hit.id = id
-        hit
-    }

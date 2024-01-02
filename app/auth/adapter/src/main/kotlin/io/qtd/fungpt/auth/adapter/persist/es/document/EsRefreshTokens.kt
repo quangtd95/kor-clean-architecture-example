@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EsRefreshTokens(
+    val id: String,
     val token: String,
     val userId: String,
     val expiresAt: LocalDateTime,
@@ -22,26 +23,12 @@ data class EsRefreshTokens(
 
         val MAPPING = IndexSettingsAndMappingsDSL().apply {
             mappings(dynamicEnabled = true) {
-                text(EsRefreshTokens::token) {
-                    fields {
-                        keyword("keyword") {
-                            ignoreAbove = "1024"
-                        }
-                    }
-                }
-                text(EsRefreshTokens::userId) {
-                    fields {
-                        keyword("keyword")
-                    }
-                }
+                keyword(EsRefreshTokens::id)
+                keyword(EsRefreshTokens::token)
+                keyword(EsRefreshTokens::userId)
                 date(EsRefreshTokens::expiresAt)
                 date(EsRefreshTokens::createdAt)
-                bool(EsRefreshTokens::revoked) {
-                    fields {
-                        keyword("keyword")
-                    }
-                }
-
+                bool(EsRefreshTokens::revoked)
             }
         }
     }
