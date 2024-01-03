@@ -13,7 +13,7 @@ import io.qtd.fungpt.common.core.extension.randomUUID
 import org.slf4j.LoggerFactory
 
 class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort {
-    val logger = LoggerFactory.getLogger(EsUserRepository::class.java)
+    private val logger = LoggerFactory.getLogger(EsUserRepository::class.java)
     override suspend fun createNewUser(email: String, password: String): CoreUser {
         val newEsUser = EsUsers(
             id = randomUUID(),

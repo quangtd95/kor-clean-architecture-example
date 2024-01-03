@@ -12,16 +12,22 @@ import io.qtd.fungpt.auth.adapter.persist.es.document.EsRefreshTokens
 import io.qtd.fungpt.auth.adapter.persist.es.document.EsUsers
 import io.qtd.fungpt.auth.adapter.persist.es.repository.EsRefreshTokenRepository
 import io.qtd.fungpt.auth.adapter.persist.es.repository.EsUserRepository
+import io.qtd.fungpt.auth.adapter.persist.postgres.entity.PgRefreshTokens
+import io.qtd.fungpt.auth.adapter.persist.postgres.entity.PgUsers
 import io.qtd.fungpt.auth.adapter.persist.postgres.repository.PgRefreshTokenRepository
 import io.qtd.fungpt.auth.adapter.persist.postgres.repository.PgUserRepository
 import io.qtd.fungpt.auth.adapter.token.TokenGenerator
 import io.qtd.fungpt.auth.core.config.JwtConfig
-import io.qtd.fungpt.auth.core.repository.*
+import io.qtd.fungpt.auth.core.repository.PasswordCheckerPort
+import io.qtd.fungpt.auth.core.repository.RefreshTokenPort
+import io.qtd.fungpt.auth.core.repository.TokenGeneratorPort
+import io.qtd.fungpt.auth.core.repository.UserPort
 import io.qtd.fungpt.common.adapter.config.PersistConfig
 import io.qtd.fungpt.common.adapter.config.PersistType
 import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
 import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider.IndexCreation
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 
@@ -63,7 +69,12 @@ fun Application.authModule() {
     }
 }
 
-suspend fun preInitEsRepoAuthModule(esProvider: ElasticsearchProvider) {
+suspend fun Application.preInitPostgresRepoAuthModule() {
+    SchemaUtils.createMissingTablesAndColumns(PgUsers, PgRefreshTokens)
+}
+
+suspend fun Application.preInitEsRepoAuthModule() {
+    val esProvider = (inject<PersistTransactionPort>().value as ElasticsearchProvider)
     esProvider.createIndexIfNotExists(
         IndexCreation(
             index = EsUsers.INDEX, mappings = EsUsers.MAPPING

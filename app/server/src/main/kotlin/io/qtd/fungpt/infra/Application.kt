@@ -6,24 +6,20 @@ import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.qtd.fungpt.auth.adapter.authAdapterKoinModule
-import io.qtd.fungpt.auth.adapter.persist.postgres.entity.PgRefreshTokens
-import io.qtd.fungpt.auth.adapter.persist.postgres.entity.PgUsers
 import io.qtd.fungpt.auth.adapter.preInitEsRepoAuthModule
+import io.qtd.fungpt.auth.adapter.preInitPostgresRepoAuthModule
 import io.qtd.fungpt.auth.core.authCoreKoinModule
 import io.qtd.fungpt.common.adapter.commonAdapterKoinModule
 import io.qtd.fungpt.common.adapter.config.PersistConfig
 import io.qtd.fungpt.common.adapter.config.PersistType
-import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
 import io.qtd.fungpt.common.core.commonCoreKoinModule
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
-import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.common.core.database.ShutdownPersistStoragePort
 import io.qtd.fungpt.infra.config.loadServerConfig
 import io.qtd.fungpt.user.adapter.userAdapterKoinModule
 import io.qtd.fungpt.user.core.userCoreKoinModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.koin.core.logger.Level
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
@@ -81,12 +77,11 @@ private fun Application.bootstrapPersistStorage() {
             val persistType = inject<PersistConfig>().value.persistType
             when (persistType) {
                 PersistType.POSTGRES -> {
-                    SchemaUtils.create(PgUsers, PgRefreshTokens)
+                    preInitPostgresRepoAuthModule()
                 }
 
                 PersistType.ES -> {
-                    val esProvider = (inject<PersistTransactionPort>().value as ElasticsearchProvider)
-                    preInitEsRepoAuthModule(esProvider)
+                    preInitEsRepoAuthModule()
                 }
             }
         }
