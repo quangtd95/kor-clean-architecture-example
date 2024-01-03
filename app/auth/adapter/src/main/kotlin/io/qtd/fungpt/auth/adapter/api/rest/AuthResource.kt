@@ -11,12 +11,12 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.qtd.fungpt.auth.adapter.api.dto.UserCredentialsResponse
-import io.qtd.fungpt.auth.adapter.extension.userId
 import io.qtd.fungpt.auth.core.usecase.AuthUsecase
 import io.qtd.fungpt.common.adapter.base.BaseResponse.Companion.created
 import io.qtd.fungpt.common.adapter.base.BaseResponse.Companion.success
 import io.qtd.fungpt.common.adapter.base.baseRespond
 import io.qtd.fungpt.common.adapter.utils.Constants.JWT_AUTH
+import io.qtd.fungpt.common.adapter.utils.userId
 import org.koin.ktor.ext.inject
 
 fun Route.auth() {

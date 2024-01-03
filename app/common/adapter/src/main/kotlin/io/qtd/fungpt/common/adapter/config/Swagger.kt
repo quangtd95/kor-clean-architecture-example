@@ -6,8 +6,6 @@ import io.github.smiley4.ktorswaggerui.dsl.OpenApiRoute
 import io.github.smiley4.ktorswaggerui.dsl.PluginConfigDsl
 
 const val SWAGGER_SECURITY_SCHEMA = "BearerJWTAuth"
-const val TAG_AUTH = "Auth"
-const val TAG_PROFILE = "Profile"
 typealias ApiDoc = OpenApiRoute.() -> Unit
 
 fun PluginConfigDsl.configSwagger() {
@@ -38,11 +36,5 @@ fun PluginConfigDsl.configSwagger() {
         type = AuthType.HTTP
         scheme = AuthScheme.BEARER
         bearerFormat = "jwt"
-    }
-    tag(TAG_AUTH) {
-        description = "Operations about authentication"
-    }
-    tag(TAG_PROFILE) {
-        description = "Operations about user"
     }
 }

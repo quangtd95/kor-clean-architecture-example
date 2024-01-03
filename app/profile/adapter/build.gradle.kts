@@ -9,6 +9,5 @@ tasks.jar {
 
 dependencies {
     implementation(project(":app:common:adapter"))
-    implementation(project(":app:auth:adapter"))
     api(project(":app:profile:core"))
 }

@@ -4,57 +4,56 @@ import io.ktor.http.*
 import io.qtd.fungpt.common.adapter.base.BaseResponse
 import io.qtd.fungpt.common.adapter.config.ApiDoc
 import io.qtd.fungpt.common.adapter.config.SWAGGER_SECURITY_SCHEMA
-import io.qtd.fungpt.common.adapter.config.TAG_PROFILE
 import io.qtd.fungpt.profile.adapter.api.dto.ProfileResponse
 
 val profilesDoc: ApiDoc = {
-    tags = listOf(TAG_PROFILE)
+    tags = listOf("Profile")
     securitySchemeName = SWAGGER_SECURITY_SCHEMA
 }
 
 val getListProfilesDoc: ApiDoc = {
-    description = "Get list users"
+    description = "Get list profiles"
     response {
         HttpStatusCode.OK to {
-            class GetListUsersDocType : BaseResponse<List<ProfileResponse>>()
-            body(GetListUsersDocType::class)
+            class GetListProfilesDocType : BaseResponse<List<ProfileResponse>>()
+            body(GetListProfilesDocType::class)
         }
     }
 }
 
 val getProfileDoc: ApiDoc = {
-    description = "Get user by userId"
+    description = "Get profile by profileId"
 
     request {
-        pathParameter<String>("userId")
+        pathParameter<String>("profileId")
     }
     response {
         HttpStatusCode.OK to {
-            class GetUserDocType : BaseResponse<ProfileResponse>()
-            body(GetUserDocType::class)
+            class GetProfileDocType : BaseResponse<ProfileResponse>()
+            body(GetProfileDocType::class)
         }
     }
 }
 
 val getCurrentProfileDoc: ApiDoc = {
-    description = "Get current user profile"
+    description = "Get current profile profile"
     response {
         HttpStatusCode.OK to {
-            class GetCurrentUserProfileDocType : BaseResponse<ProfileResponse>()
-            body(GetCurrentUserProfileDocType::class)
+            class GetCurrentProfileProfileDocType : BaseResponse<ProfileResponse>()
+            body(GetCurrentProfileProfileDocType::class)
         }
     }
 }
 
-//val updateCurrentUserProfileDoc: ApiDoc = {
-//    description = "Update current user profile"
+//val updateCurrentProfileProfileDoc: ApiDoc = {
+//    description = "Update current profile profile"
 //    request {
-//        body(UpdateUserRequest::class)
+//        body(UpdateProfileRequest::class)
 //    }
 //    response {
 //        HttpStatusCode.OK to {
-//            class UpdateCurrentUserProfileDocType : BaseResponse<UserResponse>()
-//            body(UpdateCurrentUserProfileDocType::class)
+//            class UpdateCurrentProfileProfileDocType : BaseResponse<ProfileResponse>()
+//            body(UpdateCurrentProfileProfileDocType::class)
 //        }
 //    }
 //}

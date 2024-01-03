@@ -8,11 +8,10 @@ import io.ktor.http.*
 import io.qtd.fungpt.common.adapter.base.BaseResponse
 import io.qtd.fungpt.common.adapter.config.ApiDoc
 import io.qtd.fungpt.common.adapter.config.SWAGGER_SECURITY_SCHEMA
-import io.qtd.fungpt.common.adapter.config.TAG_AUTH
 
 
 val authDoc: ApiDoc = {
-    tags = listOf(TAG_AUTH)
+    tags = listOf("Auth")
 }
 val registerDoc: ApiDoc = {
     description = "Register user"

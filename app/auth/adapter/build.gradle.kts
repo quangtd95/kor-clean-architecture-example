@@ -13,10 +13,6 @@ dependencies {
     implementation(project(":app:common:adapter"))
     api(project(":app:auth:core"))
 
-    // ------------------------ktor------------------------
-    api("io.ktor:ktor-server-auth-jvm:$ktorVersion")
-    api("io.ktor:ktor-server-auth-jwt-jvm:$ktorVersion")
-
     // ------------------------jbcrypt------------------------
     api("org.mindrot:jbcrypt:$jbCryptVersion")
 }
