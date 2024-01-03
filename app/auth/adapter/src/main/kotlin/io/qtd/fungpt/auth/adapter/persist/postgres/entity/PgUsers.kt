@@ -9,8 +9,6 @@ import java.util.*
 
 object PgUsers : UUIDTable("users") {
     val email = varchar("email", 255).uniqueIndex()
-    val bio = text("bio").default("")
-    val image = varchar("image", 255).nullable()
     val password = varchar("password", 255)
 
 }
@@ -19,15 +17,11 @@ class PgUser(id: EntityID<UUID>) : UUIDEntity(id) {
     companion object : UUIDEntityClass<PgUser>(PgUsers)
 
     var email by PgUsers.email
-    var bio by PgUsers.bio
-    var image by PgUsers.image
     var password by PgUsers.password
 
     fun toCore() = CoreUser(
         id = id.toString(),
         email = email,
-        image = image,
-        bio = bio,
         password = password
     )
 }

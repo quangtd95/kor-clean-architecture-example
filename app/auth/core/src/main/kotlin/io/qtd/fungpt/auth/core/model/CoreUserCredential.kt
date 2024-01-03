@@ -11,8 +11,6 @@ data class CoreUser(
     val id: String,
     val email: String,
     val password: String,
-    val bio: String?,
-    val image: String?,
 ) {
     companion object
 }

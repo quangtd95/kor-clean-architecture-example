@@ -19,7 +19,7 @@ data class EsRefreshTokens(
 
 
     companion object {
-        const val INDEX = "refresh_tokens"
+        const val INDEX = "auth_refresh_tokens"
 
         val MAPPING = IndexSettingsAndMappingsDSL().apply {
             mappings(dynamicEnabled = true) {

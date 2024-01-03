@@ -19,8 +19,6 @@ class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort
             id = randomUUID(),
             email = email,
             password = password,
-            bio = "",
-            image = "",
         )
 
         val indexResponse = esProvider.esClient.indexDocument(

@@ -16,8 +16,9 @@ import io.qtd.fungpt.common.core.commonCoreKoinModule
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.ShutdownPersistStoragePort
 import io.qtd.fungpt.infra.config.loadServerConfig
-import io.qtd.fungpt.user.adapter.userAdapterKoinModule
-import io.qtd.fungpt.user.core.userCoreKoinModule
+import io.qtd.fungpt.profile.adapter.preInitEsRepoProfileModule
+import io.qtd.fungpt.profile.adapter.profileAdapterKoinModule
+import io.qtd.fungpt.profile.core.profileCoreKoinModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.koin.core.logger.Level
@@ -56,8 +57,8 @@ private fun Application.installKoinModules(getHocon: () -> HoconApplicationConfi
                 authCoreKoinModule,
                 authAdapterKoinModule,
 
-                userCoreKoinModule,
-                userAdapterKoinModule,
+                profileCoreKoinModule,
+                profileAdapterKoinModule,
             )
         }
     }
@@ -78,10 +79,12 @@ private fun Application.bootstrapPersistStorage() {
             when (persistType) {
                 PersistType.POSTGRES -> {
                     preInitPostgresRepoAuthModule()
+                    //TODO: profile module hasn't supported postgres yet
                 }
 
                 PersistType.ES -> {
                     preInitEsRepoAuthModule()
+                    preInitEsRepoProfileModule()
                 }
             }
         }

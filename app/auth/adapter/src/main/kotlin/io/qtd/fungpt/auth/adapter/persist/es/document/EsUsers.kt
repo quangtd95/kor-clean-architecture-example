@@ -9,19 +9,15 @@ import kotlinx.serialization.Serializable
 data class EsUsers(
     val id: String,
     val email: String,
-    val bio: String,
-    val image: String,
     val password: String
 ) : EsBaseIdDocument() {
     companion object {
-        const val INDEX = "users"
+        const val INDEX = "auth_users"
 
         val MAPPING = IndexSettingsAndMappingsDSL().apply {
             mappings(dynamicEnabled = true) {
                 keyword(EsUsers::id)
                 keyword(EsUsers::email)
-                text(EsUsers::bio)
-                text(EsUsers::image)
                 keyword(EsUsers::password)
             }
         }
@@ -30,7 +26,7 @@ data class EsUsers(
 
     fun toCore(): CoreUser {
         return CoreUser(
-            id = id, email = email, image = image, bio = bio, password = password
+            id = id, email = email, password = password
         )
     }
 }
