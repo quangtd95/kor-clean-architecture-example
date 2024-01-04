@@ -7,6 +7,9 @@ import io.qtd.fungpt.auth.core.repository.UserPort
 import io.qtd.fungpt.auth.core.usecase.AuthUsecase
 import io.qtd.fungpt.auth.core.repository.TokenGeneratorPort
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
+import io.qtd.fungpt.common.core.event.Event
+import io.qtd.fungpt.common.core.event.EventPublisherPort
+import io.qtd.fungpt.common.core.event.EventType
 import io.qtd.fungpt.common.core.exception.LoginCredentialsInvalidException
 import io.qtd.fungpt.common.core.exception.RefreshTokenInvalidException
 import io.qtd.fungpt.common.core.exception.UserDoesNotExistsException
@@ -14,11 +17,12 @@ import io.qtd.fungpt.common.core.exception.UserExistsException
 import io.qtd.fungpt.common.core.extension.unless
 
 class AuthService(
-    private val passwordService: PasswordCheckerPort,
-    private val tokenService: TokenGeneratorPort,
+    private val passwordChecker: PasswordCheckerPort,
+    private val tokenGenerator: TokenGeneratorPort,
     private val refreshTokenPort: RefreshTokenPort,
     private val userPort: UserPort,
     private val txPort: PersistTransactionPort,
+    private val eventPublisherPort: EventPublisherPort,
 ) : AuthUsecase {
 
     override suspend fun register(email: String, password: String): CoreUserCredential = txPort.withNewTransaction {
@@ -26,13 +30,13 @@ class AuthService(
             throw UserExistsException(mapOf("email" to email))
         }
 
-        passwordService.validateFeasiblePassword(password)
+        passwordChecker.validateFeasiblePassword(password)
 
         val newUser = userPort.createNewUser(
             email = email,
-            password = passwordService.encryptPassword(password)
+            password = passwordChecker.encryptPassword(password)
         )
-        val tokens = tokenService.createTokens(newUser)
+        val tokens = tokenGenerator.createTokens(newUser)
         tokens.refreshToken.let {
             refreshTokenPort.newRefreshToken(
                 newUser.id,
@@ -40,17 +44,18 @@ class AuthService(
             )
         }
 
+        eventPublisherPort.publish(Event.of(EventType.USER_CREATED, newUser))
         CoreUserCredential(newUser, tokens)
     }
 
     override suspend fun login(email: String, password: String): CoreUserCredential = txPort.withNewTransaction {
         val user = userPort.getByEmail(email) ?: throw UserDoesNotExistsException(mapOf("email" to email))
 
-        if (passwordService.validatePassword(password, user.password)) {
+        if (passwordChecker.validatePassword(password, user.password)) {
 
             refreshTokenPort.revokeAllTokens(user.id)
 
-            val tokens = tokenService.createTokens(user)
+            val tokens = tokenGenerator.createTokens(user)
             refreshTokenPort.newRefreshToken(user.id, tokens.refreshToken, tokens.refreshTokenExpiredTime)
 
             CoreUserCredential(user, tokens)
@@ -73,14 +78,14 @@ class AuthService(
          * save the refreshToken to the database
          * return the new refreshToken and accessToken
          */
-        tokenService.verifyRefreshToken(refreshToken)?.let { userId ->
+        tokenGenerator.verifyRefreshToken(refreshToken)?.let { userId ->
             txPort.withNewTransaction {
                 unless(refreshTokenPort.verifyToken(refreshToken)) {
                     throw RefreshTokenInvalidException()
                 }
             }
             val user = getUserById(userId)
-            val tokens = tokenService.createTokens(user)
+            val tokens = tokenGenerator.createTokens(user)
             txPort.withNewTransaction {
                 refreshTokenPort.deleteToken(refreshToken)
                 refreshTokenPort.newRefreshToken(

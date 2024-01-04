@@ -15,10 +15,12 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.resources.*
 import io.qtd.fungpt.common.adapter.config.*
 import io.qtd.fungpt.common.adapter.database.*
+import io.qtd.fungpt.common.adapter.event.DummyEventPublisher
 import io.qtd.fungpt.common.adapter.utils.DataTransformationBenchmarkPlugin
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.common.core.database.ShutdownPersistStoragePort
+import io.qtd.fungpt.common.core.event.EventPublisherPort
 import org.koin.dsl.binds
 import org.koin.dsl.module
 import org.slf4j.event.Level
@@ -32,10 +34,10 @@ val commonAdapterKoinModule = module {
             PersistType.ES -> ElasticsearchProvider(persistConfig = get())
         }
     } binds arrayOf(
-        BootPersistStoragePort::class,
-        ShutdownPersistStoragePort::class,
-        PersistTransactionPort::class
+        BootPersistStoragePort::class, ShutdownPersistStoragePort::class, PersistTransactionPort::class
     )
+
+    single<EventPublisherPort> { DummyEventPublisher() }
 }
 
 

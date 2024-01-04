@@ -8,11 +8,12 @@ val authCoreKoinModule = module {
 
     single<AuthUsecase> {
         AuthService(
-            passwordService = get(),
-            tokenService = get(),
+            passwordChecker = get(),
+            tokenGenerator = get(),
             refreshTokenPort = get(),
             userPort = get(),
-            txPort = get()
+            txPort = get(),
+            eventPublisherPort = get()
         )
     }
 }
