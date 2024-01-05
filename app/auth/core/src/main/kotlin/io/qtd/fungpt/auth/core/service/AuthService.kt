@@ -7,9 +7,7 @@ import io.qtd.fungpt.auth.core.repository.UserPort
 import io.qtd.fungpt.auth.core.usecase.AuthUsecase
 import io.qtd.fungpt.auth.core.repository.TokenGeneratorPort
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
-import io.qtd.fungpt.common.core.event.Event
-import io.qtd.fungpt.common.core.event.EventPublisherPort
-import io.qtd.fungpt.common.core.event.EventType
+import io.qtd.fungpt.common.core.event.*
 import io.qtd.fungpt.common.core.exception.LoginCredentialsInvalidException
 import io.qtd.fungpt.common.core.exception.RefreshTokenInvalidException
 import io.qtd.fungpt.common.core.exception.UserDoesNotExistsException
@@ -44,7 +42,13 @@ class AuthService(
             )
         }
 
-        eventPublisherPort.publish(Event.of(EventType.USER_CREATED, newUser))
+        eventPublisherPort.publish(
+            UserEvent.UserCreatedEvent(
+                userId = newUser.id,
+                email = newUser.email
+            )
+        )
+
         CoreUserCredential(newUser, tokens)
     }
 

@@ -1,5 +1,6 @@
 package io.qtd.fungpt.profile.adapter.persist.es.repository
 
+import com.jillesvangurp.ktsearch.indexDocument
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.search
 import com.jillesvangurp.searchdsls.querydsl.matchAll
@@ -8,6 +9,7 @@ import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
 import io.qtd.fungpt.profile.adapter.persist.es.document.EsProfiles
 import io.qtd.fungpt.profile.core.model.CoreProfile
 import io.qtd.fungpt.profile.core.repository.ProfilePort
+import kotlinx.datetime.toKotlinLocalDateTime
 
 class EsProfileRepository(private val esProvider: ElasticsearchProvider) : ProfilePort {
     companion object {
@@ -27,5 +29,19 @@ class EsProfileRepository(private val esProvider: ElasticsearchProvider) : Profi
             query = matchAll()
         }
         return result.parseHits<EsProfiles>().map(EsProfiles::toCore)
+    }
+
+    override suspend fun createProfile(profile: CoreProfile): CoreProfile {
+        esProvider.esClient.indexDocument(
+            target = PROFILE_INDEX,
+            document = EsProfiles(
+                id = profile.id,
+                email = profile.email,
+                bio = profile.bio,
+                avatar = profile.avatar,
+                createdAt = profile.createdAt.toKotlinLocalDateTime()
+            )
+        )
+        return profile
     }
 }

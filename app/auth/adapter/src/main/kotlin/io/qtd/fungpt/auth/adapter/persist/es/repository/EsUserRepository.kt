@@ -10,7 +10,9 @@ import io.qtd.fungpt.auth.core.model.CoreUser
 import io.qtd.fungpt.auth.core.repository.UserPort
 import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
 import io.qtd.fungpt.common.core.extension.randomUUID
+import kotlinx.datetime.toKotlinLocalDateTime
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 
 class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort {
     private val logger = LoggerFactory.getLogger(EsUserRepository::class.java)
@@ -19,6 +21,7 @@ class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort
             id = randomUUID(),
             email = email,
             password = password,
+            createdAt = LocalDateTime.now().toKotlinLocalDateTime()
         )
 
         val indexResponse = esProvider.esClient.indexDocument(

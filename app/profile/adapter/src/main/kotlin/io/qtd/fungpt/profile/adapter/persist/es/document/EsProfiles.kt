@@ -3,14 +3,17 @@ package io.qtd.fungpt.profile.adapter.persist.es.document
 import com.jillesvangurp.searchdsls.mappingdsl.IndexSettingsAndMappingsDSL
 import io.qtd.fungpt.common.adapter.base.EsBaseIdDocument
 import io.qtd.fungpt.profile.core.model.CoreProfile
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class EsProfiles(
     val id: String,
     val email: String,
-    val bio: String,
-    val avatar: String,
+    val bio: String?,
+    val avatar: String?,
+    val createdAt: LocalDateTime,
 ) : EsBaseIdDocument() {
     companion object {
         const val INDEX = "profiles"
@@ -21,6 +24,7 @@ data class EsProfiles(
                 keyword(EsProfiles::email)
                 text(EsProfiles::bio)
                 text(EsProfiles::avatar)
+                date(EsProfiles::createdAt)
             }
         }
 
@@ -28,7 +32,11 @@ data class EsProfiles(
 
     fun toCore(): CoreProfile {
         return CoreProfile(
-            id = id, email = email, bio = bio, avatar = avatar
+            id = id,
+            email = email,
+            bio = bio,
+            avatar = avatar,
+            createdAt = createdAt.toJavaLocalDateTime()
         )
     }
 }

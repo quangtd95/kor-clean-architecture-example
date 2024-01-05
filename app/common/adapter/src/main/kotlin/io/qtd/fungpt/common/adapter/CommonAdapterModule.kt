@@ -15,18 +15,25 @@ import io.ktor.server.resources.*
 import io.qtd.fungpt.common.adapter.config.*
 import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
 import io.qtd.fungpt.common.adapter.database.PostgresProvider
+import io.qtd.fungpt.common.adapter.database.config.PersistConfig
+import io.qtd.fungpt.common.adapter.database.config.PersistType
+import io.qtd.fungpt.common.adapter.database.config.loadPersistConfig
 import io.qtd.fungpt.common.adapter.event.KafkaEventPublisher
+import io.qtd.fungpt.common.adapter.event.KafkaEventSubscriber
+import io.qtd.fungpt.common.adapter.event.config.loadKafkaConfig
 import io.qtd.fungpt.common.adapter.utils.DataTransformationBenchmarkPlugin
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.common.core.database.ShutdownPersistStoragePort
 import io.qtd.fungpt.common.core.event.EventPublisherPort
+import io.qtd.fungpt.common.core.event.EventSubscriberPort
 import org.koin.dsl.binds
 import org.koin.dsl.module
 import org.slf4j.event.Level
 
 val commonAdapterKoinModule = module {
     single { loadPersistConfig(hoconConfig = get()) }
+    single { loadKafkaConfig(hoconConfig = get()) }
 
     single {
         when (get<PersistConfig>().persistType) {
@@ -37,8 +44,8 @@ val commonAdapterKoinModule = module {
         BootPersistStoragePort::class, ShutdownPersistStoragePort::class, PersistTransactionPort::class
     )
 
-//    single<EventPublisherPort> { DummyEventPublisher() }
-    single<EventPublisherPort> { KafkaEventPublisher() }
+    single<EventPublisherPort> { KafkaEventPublisher(get()) }
+    single<EventSubscriberPort> { KafkaEventSubscriber(get()) }
 }
 
 
@@ -64,6 +71,8 @@ fun Application.commonModule() {
     install(ContentNegotiation) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
+            enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            findAndRegisterModules()
         }
     }
 

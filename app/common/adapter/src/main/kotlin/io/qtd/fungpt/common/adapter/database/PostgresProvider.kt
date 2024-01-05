@@ -2,7 +2,7 @@ package io.qtd.fungpt.common.adapter.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.qtd.fungpt.common.adapter.config.PersistConfig
+import io.qtd.fungpt.common.adapter.database.config.PersistConfig
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.MustBeCalledInTransactionContext
 import io.qtd.fungpt.common.core.database.PersistTransactionPort

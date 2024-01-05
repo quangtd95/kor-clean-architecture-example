@@ -1,9 +1,5 @@
-package io.qtd.fungpt.common.adapter.config
+package io.qtd.fungpt.common.adapter.database.config
 
-import io.qtd.fungpt.common.adapter.database.config.PostgresConfig
-import io.qtd.fungpt.common.adapter.database.config.DatabaseConfigBuilder
-import io.qtd.fungpt.common.adapter.database.config.ESConfig
-import io.qtd.fungpt.common.adapter.database.config.ESConfigBuilder
 import java.util.*
 
 enum class PersistType {
@@ -38,6 +34,6 @@ class ApplicationConfigBuilder {
     fun build(): PersistConfig = PersistConfig(postgresConfig, esConfig, persistType)
 }
 
-fun config(block: ApplicationConfigBuilder.() -> Unit): PersistConfig =
+fun persistConfig(block: ApplicationConfigBuilder.() -> Unit): PersistConfig =
     ApplicationConfigBuilder().apply(block).build()
 

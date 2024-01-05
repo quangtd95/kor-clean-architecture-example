@@ -5,7 +5,7 @@ import com.jillesvangurp.ktsearch.SearchClient
 import com.jillesvangurp.ktsearch.createIndex
 import com.jillesvangurp.ktsearch.exists
 import com.jillesvangurp.searchdsls.mappingdsl.IndexSettingsAndMappingsDSL
-import io.qtd.fungpt.common.adapter.config.PersistConfig
+import io.qtd.fungpt.common.adapter.database.config.PersistConfig
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.MustBeCalledInTransactionContext
 import io.qtd.fungpt.common.core.database.PersistTransactionPort

@@ -22,8 +22,8 @@ import io.qtd.fungpt.auth.core.repository.PasswordCheckerPort
 import io.qtd.fungpt.auth.core.repository.RefreshTokenPort
 import io.qtd.fungpt.auth.core.repository.TokenGeneratorPort
 import io.qtd.fungpt.auth.core.repository.UserPort
-import io.qtd.fungpt.common.adapter.config.PersistConfig
-import io.qtd.fungpt.common.adapter.config.PersistType
+import io.qtd.fungpt.common.adapter.database.config.PersistConfig
+import io.qtd.fungpt.common.adapter.database.config.PersistType
 import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
 import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider.IndexCreation
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
