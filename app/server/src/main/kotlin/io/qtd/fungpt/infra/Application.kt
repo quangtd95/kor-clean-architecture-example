@@ -6,17 +6,17 @@ import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.qtd.fungpt.auth.adapter.AuthAdapterModuleCreation
-import io.qtd.fungpt.auth.core.authCoreKoinModule
+import io.qtd.fungpt.auth.core.AuthCoreModuleCreation
 import io.qtd.fungpt.common.adapter.CommonAdapterModuleCreation
-import io.qtd.fungpt.common.adapter.bases.AdapterModuleCreation
-import io.qtd.fungpt.common.core.commonCoreKoinModule
+import io.qtd.fungpt.common.core.CommonCoreModuleCreation
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.ShutdownPersistStoragePort
 import io.qtd.fungpt.conversation.adapter.ConversationAdapterCreation
+import io.qtd.fungpt.conversation.core.ConversationCoreModuleCreation
 import io.qtd.fungpt.infra.configs.loadServerConfig
 import io.qtd.fungpt.profile.adapter.ProfileAdapterModuleCreation
+import io.qtd.fungpt.profile.core.ProfileCoreModuleCreation
 import io.qtd.fungpt.profile.core.events.NewProfileSubscriber
-import io.qtd.fungpt.profile.core.profileCoreKoinModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -29,27 +29,40 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("Application")
 
+val adapterEntries = listOf(
+    CommonAdapterModuleCreation(),
+    AuthAdapterModuleCreation(),
+    ProfileAdapterModuleCreation(),
+    ConversationAdapterCreation()
+)
+
+val coreEntries = listOf(
+    CommonCoreModuleCreation(),
+    AuthCoreModuleCreation(),
+    ProfileCoreModuleCreation(),
+    ConversationCoreModuleCreation(),
+)
+
 fun main(args: Array<String>) {
     val hocon = HoconApplicationConfig(ConfigFactory.load())
     val serverConfig = loadServerConfig(hocon)
-    val logger = LoggerFactory.getLogger("Application")
-    val entries = listOf(
-        CommonAdapterModuleCreation(),
-        AuthAdapterModuleCreation(),
-        ProfileAdapterModuleCreation(),
-        ConversationAdapterCreation()
-    )
 
     embeddedServer(Netty, port = serverConfig.port) {
         logger.info("Starting instance in port:${serverConfig.port}")
 
-        installKoinModules(entries) { hocon }
-        bootstrapPersistStorage(entries)
+        installKoinModules { hocon }
+        bootstrapPersistStorage()
         eventSubscriberModule()
-        module(entries)
+        module()
 
 
     }.start(wait = true)
+}
+
+fun Application.module() {
+    adapterEntries.forEach {
+        it.setupRoutingAndPlugin(this)
+    }
 }
 
 fun Application.eventSubscriberModule() {
@@ -64,7 +77,6 @@ fun Application.eventSubscriberModule() {
 }
 
 private fun Application.installKoinModules(
-    adapterEntries: List<AdapterModuleCreation>,
     getHocon: () -> HoconApplicationConfig,
 ) {
     module {
@@ -72,16 +84,14 @@ private fun Application.installKoinModules(
             slf4jLogger(level = Level.INFO)
             modules(
                 module { single { getHocon() } },
-                commonCoreKoinModule,
-                authCoreKoinModule,
-                profileCoreKoinModule,
+                *(coreEntries.map { it.setupKoinModule() }).toTypedArray(),
                 *(adapterEntries.map { it.setupKoinModule() }).toTypedArray(),
             )
         }
     }
 }
 
-private fun Application.bootstrapPersistStorage(adapterEntries: List<AdapterModuleCreation>) {
+private fun Application.bootstrapPersistStorage() {
     val shutdownStoragePort = inject<ShutdownPersistStoragePort>().value
     environment.monitor.subscribe(ApplicationStopped) {
         logger.info("ktor server is being shutdown...")
