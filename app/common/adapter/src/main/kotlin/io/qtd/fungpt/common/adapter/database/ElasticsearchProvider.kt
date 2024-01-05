@@ -1,9 +1,6 @@
 package io.qtd.fungpt.common.adapter.database
 
-import com.jillesvangurp.ktsearch.KtorRestClient
-import com.jillesvangurp.ktsearch.SearchClient
-import com.jillesvangurp.ktsearch.createIndex
-import com.jillesvangurp.ktsearch.exists
+import com.jillesvangurp.ktsearch.*
 import com.jillesvangurp.searchdsls.mappingdsl.IndexSettingsAndMappingsDSL
 import io.qtd.fungpt.common.adapter.database.config.PersistConfig
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
@@ -23,17 +20,22 @@ class ElasticsearchProvider(persistConfig: PersistConfig) :
     private val logger = LoggerFactory.getLogger(ElasticsearchProvider::class.java)
 
     override suspend fun <T> withNewTransaction(block: suspend () -> T): T {
-        return block.invoke()
+        var result: T? = null
+        esClient.bulk {
+            result = block.invoke()
+        }
+        return result!!
+
     }
 
     @MustBeCalledInTransactionContext
     override suspend fun <T> withExistingTransaction(block: suspend () -> T): T {
-        return block.invoke()
+        return withNewTransaction(block)
     }
 
     @MustBeCalledInTransactionContext
     override suspend fun <T> withTransaction(block: suspend () -> T): T {
-        return block.invoke()
+        return withNewTransaction(block)
     }
 
     override suspend fun <T> bootStorage(preInit: suspend () -> T) {
