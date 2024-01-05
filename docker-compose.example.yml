@@ -1,7 +1,12 @@
 version: "3"
 
 volumes:
-  db:
+  postgresql:
+  elasticsearch:
+  zookeeper:
+  zookeeperlog:
+  kafka:
+
 
 services:
   # ---------------------web---------------------
@@ -10,7 +15,7 @@ services:
     image: quangtd95/fun-gpt-ktor-clean-architecture:1.0.0
     environment:
       - OPENAI_TOKEN=${OPENAI_TOKEN}
-      - DATABASE_URL=jdbc:postgresql://db:5432/${POSTGRES_DB}?user=${POSTGRES_PASSWORD}&password=${POSTGRES_USER}
+      - DATABASE_URL=jdbc:postgresql://postgresql:5432/${POSTGRES_DB}?user=${POSTGRES_PASSWORD}&password=${POSTGRES_USER}
       - ES_HOST=${ES_HOST}
       - ES_PORT=${ES_PORT}
       - ES_USER=${ES_USER}
@@ -20,7 +25,7 @@ services:
     ports:
       - "8989:8989"
     depends_on:
-      db:
+      postgresql:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
@@ -28,14 +33,14 @@ services:
         condition: service_healthy
 
   # ---------------------postgres db---------------------
-  db:
+  postgresql:
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_USER=${POSTGRES_USER}
     image: postgres:14-alpine
     volumes:
-      - db:/var/lib/postgresql/data
+      - postgresql:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -57,6 +62,16 @@ services:
       interval: 30s
       timeout: 10s
       retries: 50
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
   kibana:
     image: docker.elastic.co/kibana/kibana:7.16.0
     environment:
@@ -74,7 +89,6 @@ services:
       - zookeeper
     ports:
       - '29092:29092'
-      - '9092:9092'
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
@@ -83,10 +97,13 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck:
-      test: nc -z localhost 9092 || exit -1
+      test: nc -z localhost 29092 || exit -1
       interval: 5s
       timeout: 10s
       retries: 10
+    volumes:
+      - kafka:/var/lib/kafka/data
+
 
   kafka-ui:
     image: provectuslabs/kafka-ui:v0.7.1
@@ -104,3 +121,6 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper:/var/lib/zookeeper/data
+      - zookeeperlog:/var/lib/zookeeper/log
