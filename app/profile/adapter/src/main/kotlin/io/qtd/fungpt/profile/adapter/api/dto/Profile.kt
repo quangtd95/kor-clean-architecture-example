@@ -1,6 +1,6 @@
 package io.qtd.fungpt.profile.adapter.api.dto
 
-import io.qtd.fungpt.profile.core.model.CoreProfile
+import io.qtd.fungpt.profile.core.models.CoreProfile
 import java.time.format.DateTimeFormatter
 
 data class ProfileResponse(val user: ProfileDto) {

@@ -1,7 +1,7 @@
 package io.qtd.fungpt.auth.adapter.api.dto
 
-import io.qtd.fungpt.auth.core.model.CoreCredentials
-import io.qtd.fungpt.auth.core.model.CoreUser
+import io.qtd.fungpt.auth.core.models.CoreCredentials
+import io.qtd.fungpt.auth.core.models.CoreUser
 
 data class RegisterUserRequest(val user: RegisterUserDto) {
     data class RegisterUserDto(val email: String, val password: String) {

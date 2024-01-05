@@ -1,6 +1,6 @@
 package io.qtd.fungpt.auth.adapter.password
 
-import io.qtd.fungpt.auth.core.repository.PasswordCheckerPort
+import io.qtd.fungpt.auth.core.repositories.PasswordCheckerPort
 import io.qtd.fungpt.common.core.exception.WrongRequestException
 import io.qtd.fungpt.common.core.extension.unless
 import org.mindrot.jbcrypt.BCrypt

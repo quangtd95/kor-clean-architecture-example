@@ -3,10 +3,10 @@ package io.qtd.fungpt.auth.adapter.token
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.JWTVerifier
-import io.qtd.fungpt.auth.core.config.JwtConfig
-import io.qtd.fungpt.auth.core.model.CoreCredentials
-import io.qtd.fungpt.auth.core.model.CoreUser
-import io.qtd.fungpt.auth.core.repository.TokenGeneratorPort
+import io.qtd.fungpt.auth.core.configs.JwtConfig
+import io.qtd.fungpt.auth.core.models.CoreCredentials
+import io.qtd.fungpt.auth.core.models.CoreUser
+import io.qtd.fungpt.auth.core.repositories.TokenGeneratorPort
 import java.time.LocalDateTime
 import java.time.ZoneId
 

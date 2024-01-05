@@ -5,9 +5,9 @@ import io.qtd.fungpt.auth.adapter.api.dto.RefreshTokenRequest
 import io.qtd.fungpt.auth.adapter.api.dto.RegisterUserRequest
 import io.qtd.fungpt.auth.adapter.api.dto.UserCredentialsResponse
 import io.ktor.http.*
-import io.qtd.fungpt.common.adapter.base.BaseResponse
-import io.qtd.fungpt.common.adapter.config.ApiDoc
-import io.qtd.fungpt.common.adapter.config.SWAGGER_SECURITY_SCHEMA
+import io.qtd.fungpt.common.adapter.bases.BaseResponse
+import io.qtd.fungpt.common.adapter.configs.ApiDoc
+import io.qtd.fungpt.common.adapter.configs.SWAGGER_SECURITY_SCHEMA
 
 
 val authDoc: ApiDoc = {

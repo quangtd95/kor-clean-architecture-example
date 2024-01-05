@@ -5,14 +5,14 @@ import io.github.smiley4.ktorswaggerui.dsl.route
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
-import io.qtd.fungpt.common.adapter.base.BaseResponse.Companion.success
-import io.qtd.fungpt.common.adapter.base.baseRespond
+import io.qtd.fungpt.common.adapter.bases.BaseResponse.Companion.success
+import io.qtd.fungpt.common.adapter.bases.baseRespond
 import io.qtd.fungpt.common.adapter.utils.Constants.JWT_AUTH
 import io.qtd.fungpt.common.adapter.utils.param
 import io.qtd.fungpt.common.adapter.utils.userId
 import io.qtd.fungpt.profile.adapter.api.dto.ProfileResponse
-import io.qtd.fungpt.profile.core.model.CoreProfile
-import io.qtd.fungpt.profile.core.usecase.ProfileUsecase
+import io.qtd.fungpt.profile.core.models.CoreProfile
+import io.qtd.fungpt.profile.core.usecases.ProfileUsecase
 import org.koin.ktor.ext.inject
 
 fun Route.profile() {
