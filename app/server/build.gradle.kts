@@ -28,4 +28,5 @@ dependencies {
     implementation(project(":app:common:adapter"))
     implementation(project(":app:auth:adapter"))
     implementation(project(":app:profile:adapter"))
+    implementation(project(":app:conversation:adapter"))
 }

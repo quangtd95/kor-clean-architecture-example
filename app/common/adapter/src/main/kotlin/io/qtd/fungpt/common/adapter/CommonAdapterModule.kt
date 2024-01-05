@@ -12,7 +12,10 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.resources.*
-import io.qtd.fungpt.common.adapter.configs.*
+import io.qtd.fungpt.common.adapter.bases.AdapterModuleCreation
+import io.qtd.fungpt.common.adapter.configs.configSwagger
+import io.qtd.fungpt.common.adapter.configs.cors
+import io.qtd.fungpt.common.adapter.configs.statusPages
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.adapter.databases.PostgresProvider
 import io.qtd.fungpt.common.adapter.databases.config.PersistConfig
@@ -31,60 +34,70 @@ import org.koin.dsl.binds
 import org.koin.dsl.module
 import org.slf4j.event.Level
 
-val commonAdapterKoinModule = module {
-    single { loadPersistConfig(hoconConfig = get()) }
-    single { loadKafkaConfig(hoconConfig = get()) }
+class CommonAdapterModuleCreation : AdapterModuleCreation() {
+    override suspend fun preInitDatabase() {
 
-    single {
-        when (get<PersistConfig>().persistType) {
-            PersistType.POSTGRES -> PostgresProvider(persistConfig = get())
-            PersistType.ES -> ElasticsearchProvider(persistConfig = get())
+    }
+
+    override fun setupRoutingAndPlugin(app: Application) {
+        with(app) {
+            install(DefaultHeaders)
+            install(CORS) {
+                cors()
+            }
+            install(CallLogging) {
+                level = Level.INFO
+                callIdMdc("requestId")
+            }
+
+
+            install(CallId) {
+                header(HttpHeaders.XRequestId)
+                verify { callId: String ->
+                    callId.isNotEmpty()
+                }
+                generate(10)
+            }
+
+            install(ContentNegotiation) {
+                jackson {
+                    enable(SerializationFeature.INDENT_OUTPUT)
+                    enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                    findAndRegisterModules()
+                }
+            }
+
+            install(StatusPages) {
+                statusPages()
+            }
+
+            install(Resources)
+
+            install(SwaggerUI) {
+                configSwagger()
+            }
+
+            install(DataTransformationBenchmarkPlugin)
         }
-    } binds arrayOf(
-        BootPersistStoragePort::class, ShutdownPersistStoragePort::class, PersistTransactionPort::class
-    )
+    }
 
-    single<EventPublisherPort> { KafkaEventPublisher(get()) }
-    single<EventSubscriberPort> { KafkaEventSubscriber(get()) }
+    override fun setupKoinModule() = module {
+        single { loadPersistConfig(hoconConfig = get()) }
+        single { loadKafkaConfig(hoconConfig = get()) }
+
+        single {
+            when (get<PersistConfig>().persistType) {
+                PersistType.POSTGRES -> PostgresProvider(persistConfig = get())
+                PersistType.ES -> ElasticsearchProvider(persistConfig = get())
+            }
+        } binds arrayOf(
+            BootPersistStoragePort::class,
+            ShutdownPersistStoragePort::class,
+            PersistTransactionPort::class
+        )
+
+        single<EventPublisherPort> { KafkaEventPublisher(get()) }
+        single<EventSubscriberPort> { KafkaEventSubscriber(get()) }
+    }
 }
 
-
-fun Application.commonModule() {
-    install(DefaultHeaders)
-    install(CORS) {
-        cors()
-    }
-    install(CallLogging) {
-        level = Level.INFO
-        callIdMdc("requestId")
-    }
-
-
-    install(CallId) {
-        header(HttpHeaders.XRequestId)
-        verify { callId: String ->
-            callId.isNotEmpty()
-        }
-        generate(10)
-    }
-
-    install(ContentNegotiation) {
-        jackson {
-            enable(SerializationFeature.INDENT_OUTPUT)
-            enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            findAndRegisterModules()
-        }
-    }
-
-    install(StatusPages) {
-        statusPages()
-    }
-
-    install(Resources)
-
-    install(SwaggerUI) {
-        configSwagger()
-    }
-
-    install(DataTransformationBenchmarkPlugin)
-}

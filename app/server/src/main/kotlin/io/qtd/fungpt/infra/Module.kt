@@ -1,15 +1,13 @@
 package io.qtd.fungpt.infra
 
 import io.ktor.server.application.*
-import io.qtd.fungpt.auth.adapter.authModule
-import io.qtd.fungpt.common.adapter.commonModule
-import io.qtd.fungpt.profile.adapter.profileModule
+import io.qtd.fungpt.common.adapter.bases.AdapterModuleCreation
 
 
-fun Application.module() {
-    commonModule()
-    authModule()
-    profileModule()
+fun Application.module(adapterEntries: List<AdapterModuleCreation>) {
+    adapterEntries.forEach {
+        it.setupRoutingAndPlugin(this)
+    }
 }
 
 

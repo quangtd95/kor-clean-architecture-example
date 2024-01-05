@@ -5,19 +5,16 @@ import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.qtd.fungpt.auth.adapter.authAdapterKoinModule
-import io.qtd.fungpt.auth.adapter.preInitEsRepoAuthModule
-import io.qtd.fungpt.auth.adapter.preInitPostgresRepoAuthModule
+import io.qtd.fungpt.auth.adapter.AuthAdapterModuleCreation
 import io.qtd.fungpt.auth.core.authCoreKoinModule
-import io.qtd.fungpt.common.adapter.commonAdapterKoinModule
-import io.qtd.fungpt.common.adapter.databases.config.PersistConfig
-import io.qtd.fungpt.common.adapter.databases.config.PersistType
+import io.qtd.fungpt.common.adapter.CommonAdapterModuleCreation
+import io.qtd.fungpt.common.adapter.bases.AdapterModuleCreation
 import io.qtd.fungpt.common.core.commonCoreKoinModule
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.ShutdownPersistStoragePort
+import io.qtd.fungpt.conversation.adapter.ConversationAdapterCreation
 import io.qtd.fungpt.infra.configs.loadServerConfig
-import io.qtd.fungpt.profile.adapter.preInitEsRepoProfileModule
-import io.qtd.fungpt.profile.adapter.profileAdapterKoinModule
+import io.qtd.fungpt.profile.adapter.ProfileAdapterModuleCreation
 import io.qtd.fungpt.profile.core.events.NewProfileSubscriber
 import io.qtd.fungpt.profile.core.profileCoreKoinModule
 import kotlinx.coroutines.Dispatchers
@@ -36,14 +33,20 @@ fun main(args: Array<String>) {
     val hocon = HoconApplicationConfig(ConfigFactory.load())
     val serverConfig = loadServerConfig(hocon)
     val logger = LoggerFactory.getLogger("Application")
+    val entries = listOf(
+        CommonAdapterModuleCreation(),
+        AuthAdapterModuleCreation(),
+        ProfileAdapterModuleCreation(),
+        ConversationAdapterCreation()
+    )
 
     embeddedServer(Netty, port = serverConfig.port) {
         logger.info("Starting instance in port:${serverConfig.port}")
 
-        installKoinModules { hocon }
-        bootstrapPersistStorage()
+        installKoinModules(entries) { hocon }
+        bootstrapPersistStorage(entries)
         eventSubscriberModule()
-        module()
+        module(entries)
 
 
     }.start(wait = true)
@@ -60,28 +63,25 @@ fun Application.eventSubscriberModule() {
     }
 }
 
-private fun Application.installKoinModules(getHocon: () -> HoconApplicationConfig) {
+private fun Application.installKoinModules(
+    adapterEntries: List<AdapterModuleCreation>,
+    getHocon: () -> HoconApplicationConfig,
+) {
     module {
         install(Koin) {
             slf4jLogger(level = Level.INFO)
             modules(
-                module {
-                    single { getHocon() }
-                },
+                module { single { getHocon() } },
                 commonCoreKoinModule,
-                commonAdapterKoinModule,
-
                 authCoreKoinModule,
-                authAdapterKoinModule,
-
                 profileCoreKoinModule,
-                profileAdapterKoinModule,
+                *(adapterEntries.map { it.setupKoinModule() }).toTypedArray(),
             )
         }
     }
 }
 
-private fun Application.bootstrapPersistStorage() {
+private fun Application.bootstrapPersistStorage(adapterEntries: List<AdapterModuleCreation>) {
     val shutdownStoragePort = inject<ShutdownPersistStoragePort>().value
     environment.monitor.subscribe(ApplicationStopped) {
         logger.info("ktor server is being shutdown...")
@@ -91,17 +91,9 @@ private fun Application.bootstrapPersistStorage() {
     val bootPersistStoragePort by inject<BootPersistStoragePort>()
     runBlocking(Dispatchers.IO) {
         bootPersistStoragePort.bootStorage {
-            val persistType = inject<PersistConfig>().value.persistType
-            when (persistType) {
-                PersistType.POSTGRES -> {
-                    preInitPostgresRepoAuthModule()
-                    //TODO: profile module hasn't supported postgres yet
-                }
 
-                PersistType.ES -> {
-                    preInitEsRepoAuthModule()
-                    preInitEsRepoProfileModule()
-                }
+            adapterEntries.forEach {
+                it.preInitDatabase()
             }
         }
     }
