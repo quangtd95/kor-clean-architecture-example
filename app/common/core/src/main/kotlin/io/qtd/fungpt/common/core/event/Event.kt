@@ -11,7 +11,11 @@ open class Event(
 
 sealed class UserEvent {
     class UserCreatedEvent(val userId: String, val email: String) :
-        Event("USER_EVENTS", EventType.USER_CREATED.name, LocalDateTime.now())
+        Event("USER_EVENTS", EventType.USER_CREATED.name, LocalDateTime.now()) {
+
+        @Suppress("unused") // for jackson deserialization
+        constructor() : this("", "")
+    }
 }
 
 enum class EventType {

@@ -4,6 +4,7 @@ volumes:
   db:
 
 services:
+  # ---------------------web---------------------
   web:
     build: .
     image: quangtd95/fun-gpt-ktor-clean-architecture:1.0.0
@@ -14,7 +15,8 @@ services:
       - ES_PORT=${ES_PORT}
       - ES_USER=${ES_USER}
       - ES_PASSWORD=${ES_PASSWORD}
-      - ES_HTTPS = ${ES_HTTPS}
+      - ES_HTTPS=${ES_HTTPS}
+      - KAFKA_BOOTSTRAP_SERVER=${KAFKA_BOOTSTRAP_SERVER}
     ports:
       - "8989:8989"
     depends_on:
@@ -22,6 +24,10 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  # ---------------------postgres db---------------------
   db:
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
@@ -37,6 +43,7 @@ services:
       test: [ "CMD-SHELL", "pg_isready -U gpt" ]
       interval: 1s
 
+  # ---------------------elasticsearch db---------------------
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.16.0
     environment:
@@ -60,3 +67,40 @@ services:
       - elasticsearch
     ports:
       - "5601:5601"
+  # ---------------------kafka---------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.5.3
+    depends_on:
+      - zookeeper
+    ports:
+      - '29092:29092'
+      - '9092:9092'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:9092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.1
+    ports:
+      - 8085:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      DYNAMIC_CONFIG_ENABLED: 'true'
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.0.14
+    ports:
+      - '22181:2181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
