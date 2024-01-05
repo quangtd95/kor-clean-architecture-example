@@ -5,7 +5,7 @@ import io.ktor.server.application.hooks.*
 import io.ktor.util.*
 import org.slf4j.LoggerFactory
 
-val logger = LoggerFactory.getLogger("DataTransformationBenchmarkPlugin")
+private val logger = LoggerFactory.getLogger("DataTransformationBenchmarkPlugin")
 val DataTransformationBenchmarkPlugin = createApplicationPlugin(name = "DataTransformationBenchmarkPlugin") {
     val onCallTimeKey = AttributeKey<Long>("onCallTimeKey")
     onCall { call ->
