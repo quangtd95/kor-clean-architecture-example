@@ -5,7 +5,6 @@ import io.github.smiley4.ktorswaggerui.SwaggerUI
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
-import io.ktor.server.application.*
 import io.ktor.server.plugins.callid.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -14,8 +13,9 @@ import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.resources.*
 import io.qtd.fungpt.common.adapter.config.*
-import io.qtd.fungpt.common.adapter.database.*
-import io.qtd.fungpt.common.adapter.event.DummyEventPublisher
+import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
+import io.qtd.fungpt.common.adapter.database.PostgresProvider
+import io.qtd.fungpt.common.adapter.event.KafkaEventPublisher
 import io.qtd.fungpt.common.adapter.utils.DataTransformationBenchmarkPlugin
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
@@ -37,7 +37,8 @@ val commonAdapterKoinModule = module {
         BootPersistStoragePort::class, ShutdownPersistStoragePort::class, PersistTransactionPort::class
     )
 
-    single<EventPublisherPort> { DummyEventPublisher() }
+//    single<EventPublisherPort> { DummyEventPublisher() }
+    single<EventPublisherPort> { KafkaEventPublisher() }
 }
 
 
