@@ -41,3 +41,29 @@ val deleteAllConversationsDoc: ApiDoc = {
     }
 }
 
+val deleteSingleConversationDoc: ApiDoc = {
+    description = "Delete single conversation"
+    request {
+        pathParameter<String>("conversationId")
+    }
+    response {
+        HttpStatusCode.OK to {
+            class DeleteSingleConversationDocType : BaseResponse<Any>()
+            body(DeleteSingleConversationDocType::class)
+        }
+    }
+}
+
+val getSingleConversationsDoc: ApiDoc = {
+    description = "Get conversation by id"
+    request {
+        pathParameter<String>("conversationId")
+    }
+    response {
+        HttpStatusCode.OK to {
+            class GetConversationDocType : BaseResponse<ConversationResponse>()
+            body(GetConversationDocType::class)
+        }
+    }
+}
+

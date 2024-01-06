@@ -16,10 +16,10 @@ import io.qtd.fungpt.common.adapter.bases.BaseResponse.Companion.created
 import io.qtd.fungpt.common.adapter.bases.BaseResponse.Companion.success
 import io.qtd.fungpt.common.adapter.bases.baseRespond
 import io.qtd.fungpt.common.adapter.utils.Constants.JWT_AUTH
+import io.qtd.fungpt.common.adapter.utils.conversationId
 import io.qtd.fungpt.common.adapter.utils.userId
 import io.qtd.fungpt.conversation.adapter.api.*
 import io.qtd.fungpt.conversation.adapter.api.dto.toApiResponse
-import io.qtd.fungpt.conversation.core.models.CoreConversation
 import io.qtd.fungpt.conversation.core.usecases.ConversationUsecase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -40,7 +40,7 @@ fun Route.conversations() {
 
             get(getListConversationsDoc) {
                 val conversationList = conversationUsecase.getConversations(call.userId())
-                    .map(CoreConversation::toApiResponse)
+                    .map { it.toApiResponse() }
                     .toList()
                 call.baseRespond(success(conversationList))
             }
@@ -48,6 +48,19 @@ fun Route.conversations() {
             delete(deleteAllConversationsDoc) {
                 conversationUsecase.deleteConversations(call.userId())
                 call.baseRespond(success())
+            }
+
+            route("/{conversationId}") {
+                delete(deleteSingleConversationDoc) {
+                    conversationUsecase.deleteConversation(call.userId(), call.conversationId())
+                    call.baseRespond(success())
+                }
+
+                get(getSingleConversationsDoc) {
+                    val conversation = conversationUsecase.getConversation(call.userId(), call.conversationId())
+                        .toApiResponse()
+                    call.baseRespond(success(conversation))
+                }
             }
         }
     }

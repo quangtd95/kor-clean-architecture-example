@@ -4,6 +4,7 @@ import com.jillesvangurp.ktsearch.deleteByQuery
 import com.jillesvangurp.ktsearch.indexDocument
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.search
+import com.jillesvangurp.searchdsls.querydsl.bool
 import com.jillesvangurp.searchdsls.querydsl.term
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.core.extension.randomUUID
@@ -54,5 +55,31 @@ class EsConversationRepository(private val esProvider: ElasticsearchProvider) : 
         }
         logger.info("Delete conversation with userId: $userId, result: $deleteResult")
         return true
+    }
+
+    override suspend fun deleteConversation(userId: String, conversationId: String) {
+        val deleteResult = esProvider.esClient.deleteByQuery(target = EsConversations.INDEX) {
+            query = bool {
+                must(
+                    term(EsConversations::userId, userId),
+                    term(EsConversations::id, conversationId)
+                )
+            }
+        }
+        logger.info("Delete conversation with userId: $userId, conversationId: $conversationId, result: $deleteResult")
+    }
+
+    override suspend fun getConversation(userId: String, conversationId: String): CoreConversation {
+        esProvider.esClient.search(target = EsConversations.INDEX) {
+            query = bool {
+                must(
+                    term(EsConversations::userId, userId),
+                    term(EsConversations::id, conversationId)
+                )
+            }
+        }.parseHits<EsConversations>()
+            .firstOrNull()
+            ?.let { return it.toCore() }
+            ?: throw Exception("Conversation not found")
     }
 }

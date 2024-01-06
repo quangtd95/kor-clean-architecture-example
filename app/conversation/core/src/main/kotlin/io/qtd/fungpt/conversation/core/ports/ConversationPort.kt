@@ -7,4 +7,6 @@ interface ConversationPort {
     suspend fun createNewConversation(userId: String): CoreConversation
     suspend fun getConversations(userId: String): Flow<CoreConversation>
     suspend fun deleteConversations(userId: String): Boolean
+    suspend fun deleteConversation(userId: String, conversationId: String)
+    suspend fun getConversation(userId: String, conversationId: String): CoreConversation
 }
