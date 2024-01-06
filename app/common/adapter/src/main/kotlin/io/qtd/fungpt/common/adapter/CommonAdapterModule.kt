@@ -7,6 +7,7 @@ import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.callid.*
 import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
@@ -65,6 +66,14 @@ class CommonAdapterModuleCreation : AdapterModuleCreation() {
                     enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                     findAndRegisterModules()
                 }
+//                gson {
+//                    setPrettyPrinting()
+//                    setLenient()
+//                    disableHtmlEscaping()
+//                    enableComplexMapKeySerialization()
+//                    serializeNulls()
+//                    setVersion(1.0)
+//                }
             }
 
             install(StatusPages) {
@@ -75,6 +84,12 @@ class CommonAdapterModuleCreation : AdapterModuleCreation() {
 
             install(SwaggerUI) {
                 configSwagger()
+            }
+
+            install(Compression) {
+                gzip {
+                    minimumSize(minSize = 512L)
+                }
             }
 
             install(DataTransformationBenchmarkPlugin)

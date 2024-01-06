@@ -37,6 +37,8 @@ dependencies {
     api("io.ktor:ktor-server-call-id:$ktorVersion")
     api("io.ktor:ktor-server-auth-jvm:$ktorVersion")
     api("io.ktor:ktor-server-auth-jwt-jvm:$ktorVersion")
+    api("io.ktor:ktor-server-compression:$ktorVersion")
+
 
     // ------------------------exposed------------------------
     api("org.jetbrains.exposed:exposed-core:$exposedVersion")
