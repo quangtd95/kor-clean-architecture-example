@@ -4,7 +4,10 @@ import io.ktor.http.*
 import io.qtd.fungpt.common.adapter.bases.BaseResponse
 import io.qtd.fungpt.common.adapter.configs.ApiDoc
 import io.qtd.fungpt.common.adapter.configs.SWAGGER_SECURITY_SCHEMA
+import io.qtd.fungpt.conversation.adapter.api.dto.ConversationMessageResponse
 import io.qtd.fungpt.conversation.adapter.api.dto.ConversationResponse
+import io.qtd.fungpt.conversation.adapter.api.dto.PostChat
+import kotlinx.coroutines.flow.Flow
 
 val conversationsDocs: ApiDoc = {
     tags = listOf("Conversation")
@@ -67,3 +70,44 @@ val getSingleConversationsDoc: ApiDoc = {
     }
 }
 
+val sendNewMessageDoc: ApiDoc = {
+    description = "Send new message"
+    request {
+        pathParameter<String>("conversationId")
+        body(PostChat::class)
+    }
+    response {
+        HttpStatusCode.OK to {
+            class SendNewMessageDocType : BaseResponse<List<ConversationMessageResponse>>()
+            body(SendNewMessageDocType::class)
+        }
+    }
+}
+
+val sendNewMessageStreamDoc: ApiDoc = {
+    description = "Send new message stream"
+    request {
+        pathParameter<String>("conversationId")
+        body(PostChat::class)
+    }
+    response {
+        HttpStatusCode.OK to {
+            class SendNewMessageStreamDocType : BaseResponse<Flow<String>>()
+            body(SendNewMessageStreamDocType::class)
+        }
+    }
+}
+
+val deleteSingleMessageDoc: ApiDoc = {
+    description = "Delete single message"
+    request {
+        pathParameter<String>("conversationId")
+        pathParameter<String>("messageId")
+    }
+    response {
+        HttpStatusCode.OK to {
+            class DeleteSingleMessageDocType : BaseResponse<Any>()
+            body(DeleteSingleMessageDocType::class)
+        }
+    }
+}

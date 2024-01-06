@@ -7,8 +7,14 @@ import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider.IndexCreation
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.conversation.adapter.api.rest.conversations
+import io.qtd.fungpt.conversation.adapter.api.rest.conversationsMessages
+import io.qtd.fungpt.conversation.adapter.chat.ChatBotAdapter
 import io.qtd.fungpt.conversation.adapter.persist.es.documents.EsConversations
+import io.qtd.fungpt.conversation.adapter.persist.es.documents.EsConversationsMessages
+import io.qtd.fungpt.conversation.adapter.persist.es.repositories.EsConversationMessageRepository
 import io.qtd.fungpt.conversation.adapter.persist.es.repositories.EsConversationRepository
+import io.qtd.fungpt.conversation.core.ports.ChatPort
+import io.qtd.fungpt.conversation.core.ports.ConversationMessagePort
 import io.qtd.fungpt.conversation.core.ports.ConversationPort
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -21,6 +27,9 @@ class ConversationAdapterCreation : KoinComponent, AdapterModuleCreation() {
         esProvider.createIndexIfNotExists(
             IndexCreation(
                 index = EsConversations.INDEX, mappings = EsConversations.MAPPING
+            ),
+            IndexCreation(
+                index = EsConversationsMessages.INDEX, mappings = EsConversationsMessages.MAPPING
             )
         )
     }
@@ -30,6 +39,7 @@ class ConversationAdapterCreation : KoinComponent, AdapterModuleCreation() {
             routing {
                 route("/api") {
                     conversations()
+                    conversationsMessages()
                 }
             }
         }
@@ -38,9 +48,12 @@ class ConversationAdapterCreation : KoinComponent, AdapterModuleCreation() {
     override fun setupKoinModule() = module {
         //TODO hardcode es type
         single<ConversationPort> { EsConversationRepository(get<PersistTransactionPort>() as ElasticsearchProvider) }
+        single<ConversationMessagePort> {
+            EsConversationMessageRepository(get<PersistTransactionPort>() as ElasticsearchProvider)
+        }
+        single<ChatPort> {
+            ChatBotAdapter(get())
+        }
+
     }
-
-
 }
-
-

@@ -72,18 +72,26 @@ fun Route.conversations() {
  *
  * You can read more about it here: https://www.html5rocks.com/en/tutorials/eventsource/basics/
  */
-suspend fun ApplicationCall.respondSse(eventFlow: Flow<String>) {
+suspend fun ApplicationCall.respondSse(eventFlow: Flow<Any>) {
     response.cacheControl(CacheControl.NoCache(null))
     respondBytesWriter(contentType = ContentType.Text.EventStream) {
         eventFlow.onCompletion {
             flush()
             close()
         }.collect { event ->
-            for (dataLine in event.lines()) {
-                writeStringUtf8("data: $dataLine\n")
+            if (event is String) {
+                for (dataLine in event.lines()) {
+                    writeStringUtf8("data: $dataLine\n")
+                }
+                writeStringUtf8("\n")
+                flush()
+            } else {
+                //TODO: serialize event in json data
+                writeStringUtf8("data: $event\n")
+                writeStringUtf8("\n")
+                flush()
             }
-            writeStringUtf8("\n")
-            flush()
+
         }
     }
 }

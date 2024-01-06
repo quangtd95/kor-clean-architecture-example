@@ -25,6 +25,9 @@ import io.qtd.fungpt.common.adapter.databases.config.loadPersistConfig
 import io.qtd.fungpt.common.adapter.events.KafkaEventPublisher
 import io.qtd.fungpt.common.adapter.events.KafkaEventSubscriber
 import io.qtd.fungpt.common.adapter.events.config.loadKafkaConfig
+import io.qtd.fungpt.common.adapter.openai.IOpenAIChatService
+import io.qtd.fungpt.common.adapter.openai.OpenAIService
+import io.qtd.fungpt.common.adapter.openai.loadOpenAIConfig
 import io.qtd.fungpt.common.adapter.utils.DataTransformationBenchmarkPlugin
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
@@ -99,6 +102,7 @@ class CommonAdapterModuleCreation : AdapterModuleCreation() {
     override fun setupKoinModule() = module {
         single { loadPersistConfig(hoconConfig = get()) }
         single { loadKafkaConfig(hoconConfig = get()) }
+        single { loadOpenAIConfig(hoconConfig = get()) }
 
         single {
             when (get<PersistConfig>().persistType) {
@@ -106,13 +110,14 @@ class CommonAdapterModuleCreation : AdapterModuleCreation() {
                 PersistType.ES -> ElasticsearchProvider(persistConfig = get())
             }
         } binds arrayOf(
-            BootPersistStoragePort::class,
-            ShutdownPersistStoragePort::class,
-            PersistTransactionPort::class
+            BootPersistStoragePort::class, ShutdownPersistStoragePort::class, PersistTransactionPort::class
         )
 
         single<EventPublisherPort> { KafkaEventPublisher(get()) }
         single<EventSubscriberPort> { KafkaEventSubscriber(get()) }
+        single<IOpenAIChatService> {
+            OpenAIService(get())
+        }
     }
 }
 
