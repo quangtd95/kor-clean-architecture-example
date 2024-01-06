@@ -26,7 +26,7 @@ class ConversationMessageService(
     ): Flow<CoreConversationMessage> {
         return txPort.withNewTransaction {
             flow {
-                val lastMessages = conversationMessagePort.getMessages(userId, conversationId).take(2).toList()
+                val lastMessages = conversationMessagePort.getMessages(userId, conversationId).toList()
                 val userMessage = conversationMessagePort.addUserMessage(userId, conversationId, message)
                 emit(userMessage)
 

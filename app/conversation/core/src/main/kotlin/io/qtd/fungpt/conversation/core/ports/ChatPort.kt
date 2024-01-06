@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface ChatPort {
     suspend fun chat(messages: List<ChatBotMessage>): String
     suspend fun chatInStream(messages: List<ChatBotMessage>): Flow<String>
+    suspend fun generateTitleForConversation(messages: List<ChatBotMessage>): String
 }

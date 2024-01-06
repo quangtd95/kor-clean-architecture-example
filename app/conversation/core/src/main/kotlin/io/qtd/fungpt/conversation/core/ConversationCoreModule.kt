@@ -14,7 +14,8 @@ class ConversationCoreModuleCreation : CoreModuleCreation() {
             ConversationService(
                 conversationPort = get(),
                 conversationMessagePort = get(),
-                txPort = get()
+                txPort = get(),
+                chatPort = get()
             )
         }
         single<ConversationMessageUsecase> {

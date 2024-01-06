@@ -16,35 +16,50 @@ import kotlin.time.Duration.Companion.seconds
 
 
 interface IOpenAIChatService {
-    suspend fun chat(message: List<Message>): String
-    suspend fun chatStream(message: List<Message>): Flow<String>
+    suspend fun chat(messages: List<Message>): String
+    suspend fun chatStream(messages: List<Message>): Flow<String>
+    suspend fun generateTitleForConversation(messages: List<Message>): String
 }
 
 
 class OpenAIService(private val openAiConfig: OpenAiConfig) : KoinComponent, IOpenAIChatService {
     private val openAI = getOpenAIInstance(openAiConfig)
 
-    override suspend fun chat(message: List<Message>): String {
-        val result = openAI.chatCompletion(
+    override suspend fun chat(messages: List<Message>): String {
+        return sendPrompt(messages, system_instructions_chat)
+    }
+
+    override suspend fun generateTitleForConversation(messages: List<Message>): String {
+        return sendPrompt(messages, system_instructions_generate_title)
+    }
+
+    override suspend fun chatStream(messages: List<Message>): Flow<String> {
+        val result = openAI.chatCompletions(
             ChatCompletionRequest(model = ModelId(openAiConfig.model), messages = listOf(
-                ChatMessage(role = ChatRole.System, content = system_instructions)
-            ) + message.map { ChatMessage(role = fromString(it.role), content = it.content) })
+                ChatMessage(role = ChatRole.System, content = system_instructions_chat)
+            ) + messages.map { ChatMessage(role = fromString(it.role), content = it.content) })
+        )
+        return result.map {
+            it.choices[0].delta.content ?: ""
+        }
+    }
+
+
+    private suspend fun sendPrompt(messages: List<Message>, systemInstruction: String): String {
+        val systemMessage = ChatMessage(role = ChatRole.System, content = systemInstruction)
+        val chatMessages = messages.map { ChatMessage(role = fromString(it.role), content = it.content) }
+        val sendMessages = listOf(systemMessage) + chatMessages
+
+        val result = openAI.chatCompletion(
+            ChatCompletionRequest(
+                model = ModelId(openAiConfig.model),
+                messages = sendMessages
+            )
         )
         return if (result.choices.isNotEmpty()) {
             result.choices[0].message.content ?: "Sorry I don't understand"
         } else {
             "Sorry I don't understand"
-        }
-    }
-
-    override suspend fun chatStream(message: List<Message>): Flow<String> {
-        val result = openAI.chatCompletions(
-            ChatCompletionRequest(model = ModelId(openAiConfig.model), messages = listOf(
-                ChatMessage(role = ChatRole.System, content = system_instructions)
-            ) + message.map { ChatMessage(role = fromString(it.role), content = it.content) })
-        )
-        return result.map {
-            it.choices[0].delta.content ?: ""
         }
     }
 
@@ -60,7 +75,13 @@ class OpenAIService(private val openAiConfig: OpenAiConfig) : KoinComponent, IOp
     )
 }
 
-val system_instructions = """
+val system_instructions_generate_title = """
+    You are a fun assistant, your name is Fun-GPT, you can answer everything concisely. 
+    You just need to generate a title that encapsulates the essence of our conversation so far.
+    Maximum length of the title is 60 characters.
+""".trimIndent()
+
+val system_instructions_chat = """
     You are a fun assistant, your name is Fun-GPT, you can answer everything concisely. 
     At the end of each answer, add a fun fact or a short joke. 
     Use many icons with a humorous style.

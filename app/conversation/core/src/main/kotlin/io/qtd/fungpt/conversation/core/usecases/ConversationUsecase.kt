@@ -9,4 +9,5 @@ interface ConversationUsecase {
     suspend fun deleteConversations(userId: String)
     suspend fun deleteConversation(userId: String, conversationId: String)
     suspend fun getConversation(userId: String, conversationId: String): CoreConversation
+    suspend fun generateTitleConversation(userId: String, conversationId: String): CoreConversation
 }

@@ -61,6 +61,12 @@ fun Route.conversations() {
                         .toApiResponse()
                     call.baseRespond(success(conversation))
                 }
+
+                post("/title") {
+                    val conversation = conversationUsecase.generateTitleConversation(call.userId(), call.conversationId())
+                        .toApiResponse()
+                    call.baseRespond(success(conversation))
+                }
             }
         }
     }

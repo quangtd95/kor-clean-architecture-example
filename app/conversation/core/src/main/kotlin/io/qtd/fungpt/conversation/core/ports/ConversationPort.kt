@@ -10,4 +10,5 @@ interface ConversationPort {
     suspend fun deleteConversations(userId: String): Boolean
     suspend fun deleteConversation(userId: String, conversationId: String)
     suspend fun getConversation(userId: String, conversationId: String): CoreConversation
+    suspend fun updateTitleConversation(userId: String, conversationId: String, title: String): CoreConversation
 }

@@ -16,4 +16,10 @@ class ChatBotAdapter(private val openAIChatService: IOpenAIChatService) : ChatPo
                 Message(it.role, it.content)
             })
     }
+
+    override suspend fun generateTitleForConversation(messages: List<ChatBotMessage>): String {
+        return openAIChatService.generateTitleForConversation(messages.map {
+                Message(it.role, it.content)
+            })
+    }
 }
