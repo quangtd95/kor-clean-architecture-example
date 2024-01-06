@@ -8,7 +8,7 @@ import com.jillesvangurp.searchdsls.querydsl.term
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.profile.adapter.persist.es.documents.EsProfiles
 import io.qtd.fungpt.profile.core.models.CoreProfile
-import io.qtd.fungpt.profile.core.repositories.ProfilePort
+import io.qtd.fungpt.profile.core.ports.ProfilePort
 import kotlinx.datetime.toKotlinLocalDateTime
 
 class EsProfileRepository(private val esProvider: ElasticsearchProvider) : ProfilePort {

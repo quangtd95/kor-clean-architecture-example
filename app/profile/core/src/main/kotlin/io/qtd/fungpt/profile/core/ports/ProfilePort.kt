@@ -1,4 +1,4 @@
-package io.qtd.fungpt.profile.core.repositories
+package io.qtd.fungpt.profile.core.ports
 
 import io.qtd.fungpt.profile.core.models.CoreProfile
 

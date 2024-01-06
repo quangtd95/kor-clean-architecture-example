@@ -2,7 +2,7 @@ package io.qtd.fungpt.profile.core.services
 
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.common.core.exception.UserDoesNotExistsException
-import io.qtd.fungpt.profile.core.repositories.ProfilePort
+import io.qtd.fungpt.profile.core.ports.ProfilePort
 import io.qtd.fungpt.profile.core.usecases.ProfileUsecase
 
 class ProfileService(

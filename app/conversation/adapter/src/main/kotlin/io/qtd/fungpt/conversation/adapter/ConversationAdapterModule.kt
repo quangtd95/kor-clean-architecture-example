@@ -9,7 +9,7 @@ import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.conversation.adapter.api.rest.conversations
 import io.qtd.fungpt.conversation.adapter.persist.es.documents.EsConversations
 import io.qtd.fungpt.conversation.adapter.persist.es.repositories.EsConversationRepository
-import io.qtd.fungpt.conversation.core.repositories.ConversationPort
+import io.qtd.fungpt.conversation.core.ports.ConversationPort
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.dsl.module

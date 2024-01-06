@@ -18,10 +18,10 @@ import io.qtd.fungpt.auth.adapter.persist.postgres.repositories.PgRefreshTokenRe
 import io.qtd.fungpt.auth.adapter.persist.postgres.repositories.PgUserRepository
 import io.qtd.fungpt.auth.adapter.token.TokenGenerator
 import io.qtd.fungpt.auth.core.configs.JwtConfig
-import io.qtd.fungpt.auth.core.repositories.PasswordCheckerPort
-import io.qtd.fungpt.auth.core.repositories.RefreshTokenPort
-import io.qtd.fungpt.auth.core.repositories.TokenGeneratorPort
-import io.qtd.fungpt.auth.core.repositories.UserPort
+import io.qtd.fungpt.auth.core.ports.PasswordCheckerPort
+import io.qtd.fungpt.auth.core.ports.RefreshTokenPort
+import io.qtd.fungpt.auth.core.ports.TokenGeneratorPort
+import io.qtd.fungpt.auth.core.ports.UserPort
 import io.qtd.fungpt.common.adapter.bases.AdapterModuleCreation
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider.IndexCreation

@@ -3,7 +3,7 @@ package io.qtd.fungpt.auth.adapter.persist.postgres.repositories
 import io.qtd.fungpt.auth.adapter.persist.postgres.entities.PgUser
 import io.qtd.fungpt.auth.adapter.persist.postgres.entities.PgUsers
 import io.qtd.fungpt.auth.core.models.CoreUser
-import io.qtd.fungpt.auth.core.repositories.UserPort
+import io.qtd.fungpt.auth.core.ports.UserPort
 import java.util.*
 
 object PgUserRepository : UserPort {

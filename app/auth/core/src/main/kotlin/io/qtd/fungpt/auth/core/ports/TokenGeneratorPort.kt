@@ -1,4 +1,4 @@
-package io.qtd.fungpt.auth.core.repositories
+package io.qtd.fungpt.auth.core.ports
 
 import io.qtd.fungpt.auth.core.models.CoreCredentials
 import io.qtd.fungpt.auth.core.models.CoreUser

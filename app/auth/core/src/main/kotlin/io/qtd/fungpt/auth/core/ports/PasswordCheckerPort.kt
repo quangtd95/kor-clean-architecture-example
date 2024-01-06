@@ -1,4 +1,4 @@
-package io.qtd.fungpt.auth.core.repositories
+package io.qtd.fungpt.auth.core.ports
 
 interface PasswordCheckerPort {
     fun validatePassword(attempt: String, userPassword: String): Boolean

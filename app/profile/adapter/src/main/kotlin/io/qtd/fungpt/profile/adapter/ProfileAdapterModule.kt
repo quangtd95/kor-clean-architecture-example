@@ -9,7 +9,7 @@ import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.profile.adapter.api.rest.profile
 import io.qtd.fungpt.profile.adapter.persist.es.documents.EsProfiles
 import io.qtd.fungpt.profile.adapter.persist.es.repositories.EsProfileRepository
-import io.qtd.fungpt.profile.core.repositories.ProfilePort
+import io.qtd.fungpt.profile.core.ports.ProfilePort
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.dsl.module

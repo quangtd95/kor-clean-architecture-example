@@ -1,11 +1,11 @@
 package io.qtd.fungpt.auth.core.services
 
 import io.qtd.fungpt.auth.core.models.CoreUserCredential
-import io.qtd.fungpt.auth.core.repositories.PasswordCheckerPort
-import io.qtd.fungpt.auth.core.repositories.RefreshTokenPort
-import io.qtd.fungpt.auth.core.repositories.UserPort
+import io.qtd.fungpt.auth.core.ports.PasswordCheckerPort
+import io.qtd.fungpt.auth.core.ports.RefreshTokenPort
+import io.qtd.fungpt.auth.core.ports.UserPort
 import io.qtd.fungpt.auth.core.usecases.AuthUsecase
-import io.qtd.fungpt.auth.core.repositories.TokenGeneratorPort
+import io.qtd.fungpt.auth.core.ports.TokenGeneratorPort
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.common.core.event.*
 import io.qtd.fungpt.common.core.exception.LoginCredentialsInvalidException

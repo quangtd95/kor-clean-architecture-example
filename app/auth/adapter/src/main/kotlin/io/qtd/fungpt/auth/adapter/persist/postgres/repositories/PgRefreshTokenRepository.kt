@@ -3,7 +3,7 @@ package io.qtd.fungpt.auth.adapter.persist.postgres.repositories
 import io.qtd.fungpt.auth.adapter.persist.postgres.entities.PgRefreshToken
 import io.qtd.fungpt.auth.adapter.persist.postgres.entities.PgRefreshTokens
 import io.qtd.fungpt.auth.adapter.persist.postgres.entities.PgRefreshTokens.revoked
-import io.qtd.fungpt.auth.core.repositories.RefreshTokenPort
+import io.qtd.fungpt.auth.core.ports.RefreshTokenPort
 import org.jetbrains.exposed.sql.and
 import java.time.LocalDateTime
 import java.util.*

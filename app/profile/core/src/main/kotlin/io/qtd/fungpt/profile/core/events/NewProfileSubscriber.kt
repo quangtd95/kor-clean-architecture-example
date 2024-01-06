@@ -5,7 +5,7 @@ import io.qtd.fungpt.common.core.event.EventSubscriberPort
 import io.qtd.fungpt.common.core.event.EventType
 import io.qtd.fungpt.common.core.event.UserEvent
 import io.qtd.fungpt.profile.core.models.CoreProfile
-import io.qtd.fungpt.profile.core.repositories.ProfilePort
+import io.qtd.fungpt.profile.core.ports.ProfilePort
 import org.slf4j.LoggerFactory
 
 class NewProfileSubscriber(

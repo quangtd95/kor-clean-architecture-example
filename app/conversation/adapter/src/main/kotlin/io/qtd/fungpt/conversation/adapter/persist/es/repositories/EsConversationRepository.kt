@@ -9,7 +9,7 @@ import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.core.extension.randomUUID
 import io.qtd.fungpt.conversation.adapter.persist.es.documents.EsConversations
 import io.qtd.fungpt.conversation.core.models.CoreConversation
-import io.qtd.fungpt.conversation.core.repositories.ConversationPort
+import io.qtd.fungpt.conversation.core.ports.ConversationPort
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.toKotlinLocalDateTime

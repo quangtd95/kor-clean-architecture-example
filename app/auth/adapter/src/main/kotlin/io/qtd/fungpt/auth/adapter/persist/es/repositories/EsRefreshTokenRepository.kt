@@ -5,7 +5,7 @@ import com.jillesvangurp.searchdsls.querydsl.bool
 import com.jillesvangurp.searchdsls.querydsl.term
 import io.qtd.fungpt.auth.adapter.persist.es.documents.EsRefreshTokens
 import io.qtd.fungpt.auth.core.models.CoreRefreshToken
-import io.qtd.fungpt.auth.core.repositories.RefreshTokenPort
+import io.qtd.fungpt.auth.core.ports.RefreshTokenPort
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.core.extension.randomUUID
 import kotlinx.datetime.toKotlinLocalDateTime

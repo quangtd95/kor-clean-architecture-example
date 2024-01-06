@@ -7,7 +7,7 @@ import com.jillesvangurp.searchdsls.querydsl.matchAll
 import com.jillesvangurp.searchdsls.querydsl.term
 import io.qtd.fungpt.auth.adapter.persist.es.documents.EsUsers
 import io.qtd.fungpt.auth.core.models.CoreUser
-import io.qtd.fungpt.auth.core.repositories.UserPort
+import io.qtd.fungpt.auth.core.ports.UserPort
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.core.extension.randomUUID
 import kotlinx.datetime.toKotlinLocalDateTime

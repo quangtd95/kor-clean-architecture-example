@@ -1,4 +1,4 @@
-package io.qtd.fungpt.conversation.core.repositories
+package io.qtd.fungpt.conversation.core.ports
 
 import io.qtd.fungpt.conversation.core.models.CoreConversation
 import kotlinx.coroutines.flow.Flow
