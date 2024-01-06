@@ -31,3 +31,13 @@ val getListConversationsDoc: ApiDoc = {
     }
 }
 
+val deleteAllConversationsDoc: ApiDoc = {
+    description = "Delete conversations"
+    response {
+        HttpStatusCode.OK to {
+            class DeleteAllConversationsDocType : BaseResponse<Any>()
+            body(DeleteAllConversationsDocType::class)
+        }
+    }
+}
+

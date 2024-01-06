@@ -1,5 +1,6 @@
 package io.qtd.fungpt.conversation.adapter.persist.es.repositories
 
+import com.jillesvangurp.ktsearch.deleteByQuery
 import com.jillesvangurp.ktsearch.indexDocument
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.search
@@ -9,7 +10,6 @@ import io.qtd.fungpt.common.core.extension.randomUUID
 import io.qtd.fungpt.conversation.adapter.persist.es.documents.EsConversations
 import io.qtd.fungpt.conversation.core.models.CoreConversation
 import io.qtd.fungpt.conversation.core.repositories.ConversationPort
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.toKotlinLocalDateTime
@@ -17,7 +17,9 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 class EsConversationRepository(private val esProvider: ElasticsearchProvider) : ConversationPort {
+
     private val logger = LoggerFactory.getLogger(EsConversationRepository::class.java)
+
     override suspend fun createNewConversation(userId: String): CoreConversation {
         val newConversation = EsConversations(
             id = randomUUID(),
@@ -38,11 +40,19 @@ class EsConversationRepository(private val esProvider: ElasticsearchProvider) : 
         return newConversation.toCore()
     }
 
-    override suspend fun getConversations(userId: String): Flow<CoreConversation> {
-        return esProvider.esClient.search(target = EsConversations.INDEX) {
+    override suspend fun getConversations(userId: String) = esProvider.esClient
+        .search(target = EsConversations.INDEX) {
             term(EsConversations::userId, userId)
-        }.parseHits<EsConversations>()
-            .asFlow()
-            .map { it.toCore() }
+        }
+        .parseHits<EsConversations>()
+        .asFlow()
+        .map { it.toCore() }
+
+    override suspend fun deleteConversations(userId: String): Boolean {
+        val deleteResult = esProvider.esClient.deleteByQuery(target = EsConversations.INDEX) {
+            query = term(EsConversations::userId, userId)
+        }
+        logger.info("Delete conversation with userId: $userId, result: $deleteResult")
+        return true
     }
 }

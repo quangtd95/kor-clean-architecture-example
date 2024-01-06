@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface ConversationPort {
     suspend fun createNewConversation(userId: String): CoreConversation
     suspend fun getConversations(userId: String): Flow<CoreConversation>
+    suspend fun deleteConversations(userId: String): Boolean
 }

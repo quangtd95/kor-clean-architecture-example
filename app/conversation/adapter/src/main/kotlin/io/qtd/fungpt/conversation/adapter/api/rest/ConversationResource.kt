@@ -1,5 +1,6 @@
 package io.qtd.fungpt.conversation.adapter.api.rest
 
+import io.github.smiley4.ktorswaggerui.dsl.delete
 import io.github.smiley4.ktorswaggerui.dsl.get
 import io.github.smiley4.ktorswaggerui.dsl.post
 import io.github.smiley4.ktorswaggerui.dsl.route
@@ -42,6 +43,11 @@ fun Route.conversations() {
                     .map(CoreConversation::toApiResponse)
                     .toList()
                 call.baseRespond(success(conversationList))
+            }
+
+            delete(deleteAllConversationsDoc) {
+                conversationUsecase.deleteConversations(call.userId())
+                call.baseRespond(success())
             }
         }
     }
