@@ -20,3 +20,14 @@ val createConversationDoc: ApiDoc = {
         }
     }
 }
+
+val getListConversationsDoc: ApiDoc = {
+    description = "Get conversations"
+    response {
+        HttpStatusCode.OK to {
+            class GetListConversationsDocType : BaseResponse<List<ConversationResponse>>()
+            body(GetListConversationsDocType::class)
+        }
+    }
+}
+

@@ -1,11 +1,17 @@
 package io.qtd.fungpt.conversation.adapter.persist.es.repositories
 
 import com.jillesvangurp.ktsearch.indexDocument
+import com.jillesvangurp.ktsearch.parseHits
+import com.jillesvangurp.ktsearch.search
+import com.jillesvangurp.searchdsls.querydsl.term
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.core.extension.randomUUID
 import io.qtd.fungpt.conversation.adapter.persist.es.documents.EsConversations
 import io.qtd.fungpt.conversation.core.models.CoreConversation
 import io.qtd.fungpt.conversation.core.repositories.ConversationPort
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.toKotlinLocalDateTime
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
@@ -30,5 +36,13 @@ class EsConversationRepository(private val esProvider: ElasticsearchProvider) : 
         logger.info("Create new conversation with id: ${indexResponse.id}")
 
         return newConversation.toCore()
+    }
+
+    override suspend fun getConversations(userId: String): Flow<CoreConversation> {
+        return esProvider.esClient.search(target = EsConversations.INDEX) {
+            term(EsConversations::userId, userId)
+        }.parseHits<EsConversations>()
+            .asFlow()
+            .map { it.toCore() }
     }
 }
