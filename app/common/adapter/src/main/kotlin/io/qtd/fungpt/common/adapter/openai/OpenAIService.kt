@@ -21,7 +21,7 @@ interface IOpenAIChatService {
 }
 
 
-class OpenAIService(private val openAiConfig: io.qtd.fungpt.common.adapter.openai.OpenAIConfig) : KoinComponent, IOpenAIChatService {
+class OpenAIService(private val openAiConfig: OpenAiConfig) : KoinComponent, IOpenAIChatService {
     private val openAI = getOpenAIInstance(openAiConfig)
 
     override suspend fun chat(message: List<Message>): String {
@@ -48,7 +48,7 @@ class OpenAIService(private val openAiConfig: io.qtd.fungpt.common.adapter.opena
         }
     }
 
-    private fun getOpenAIInstance(openAiConfig: io.qtd.fungpt.common.adapter.openai.OpenAIConfig) = OpenAI(
+    private fun getOpenAIInstance(openAiConfig: OpenAiConfig) = OpenAI(
         OpenAIConfig(
             token = openAiConfig.token,
             logging = LoggingConfig(
