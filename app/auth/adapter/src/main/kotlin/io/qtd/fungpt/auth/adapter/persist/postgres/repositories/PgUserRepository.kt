@@ -4,6 +4,8 @@ import io.qtd.fungpt.auth.adapter.persist.postgres.entities.PgUser
 import io.qtd.fungpt.auth.adapter.persist.postgres.entities.PgUsers
 import io.qtd.fungpt.auth.core.models.CoreUser
 import io.qtd.fungpt.auth.core.ports.UserPort
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import java.util.*
 
 object PgUserRepository : UserPort {
@@ -17,7 +19,12 @@ object PgUserRepository : UserPort {
 
     override suspend fun getByUserId(userId: String) = PgUser.findById(UUID.fromString(userId))?.toCore()
 
-    override suspend fun getByEmail(email: String): CoreUser? = PgUser.find { (PgUsers.email eq email) }.firstOrNull()?.toCore()
+    override suspend fun getByEmail(email: String): CoreUser? =
+        PgUser.find { (PgUsers.email eq email) }.firstOrNull()?.toCore()
 
     override suspend fun getAllUsers() = PgUser.all().map(PgUser::toCore)
+
+    override suspend fun deleteUser(userId: String) {
+        PgUsers.deleteWhere { PgUsers.id eq UUID.fromString(userId) }
+    }
 }

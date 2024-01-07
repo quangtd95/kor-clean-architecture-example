@@ -1,5 +1,6 @@
 package io.qtd.fungpt.auth.adapter.persist.es.repositories
 
+import com.jillesvangurp.ktsearch.deleteByQuery
 import com.jillesvangurp.ktsearch.indexDocument
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.search
@@ -58,5 +59,12 @@ class EsUserRepository(private val esProvider: ElasticsearchProvider) : UserPort
             query = matchAll()
         }
         return result.parseHits<EsUsers>().map(EsUsers::toCore)
+    }
+
+    override suspend fun deleteUser(userId: String) {
+        val deleteResult = esProvider.esClient.deleteByQuery(target = EsUsers.INDEX) {
+            query = term(EsUsers::id, userId)
+        }
+        logger.info("Delete user with id: $userId, result: $deleteResult")
     }
 }

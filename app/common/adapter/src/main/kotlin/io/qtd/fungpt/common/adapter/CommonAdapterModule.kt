@@ -14,6 +14,7 @@ import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.resources.*
 import io.qtd.fungpt.common.adapter.bases.AdapterModuleCreation
+import io.qtd.fungpt.common.adapter.bases.EventSubscriber
 import io.qtd.fungpt.common.adapter.configs.configSwagger
 import io.qtd.fungpt.common.adapter.configs.cors
 import io.qtd.fungpt.common.adapter.configs.statusPages
@@ -43,7 +44,7 @@ class CommonAdapterModuleCreation : AdapterModuleCreation() {
 
     }
 
-    override fun setupRoutingAndPlugin(app: Application) {
+    override fun setupApiAndPlugin(app: Application) {
         with(app) {
             install(DefaultHeaders)
             install(CORS) {
@@ -119,5 +120,7 @@ class CommonAdapterModuleCreation : AdapterModuleCreation() {
             OpenAIService(get())
         }
     }
+
+    override fun getEventSubscriber(): List<EventSubscriber> = listOf()
 }
 

@@ -1,5 +1,6 @@
 package io.qtd.fungpt.profile.adapter.persist.es.repositories
 
+import com.jillesvangurp.ktsearch.deleteByQuery
 import com.jillesvangurp.ktsearch.indexDocument
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.search
@@ -43,5 +44,13 @@ class EsProfileRepository(private val esProvider: ElasticsearchProvider) : Profi
             )
         )
         return profile
+    }
+
+    override suspend fun deleteProfile(profileId: String) {
+        esProvider.esClient.deleteByQuery(
+            target = PROFILE_INDEX,
+        ) {
+            query = term(EsProfiles::id, profileId)
+        }
     }
 }

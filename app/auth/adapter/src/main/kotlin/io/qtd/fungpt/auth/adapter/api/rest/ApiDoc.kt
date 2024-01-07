@@ -1,10 +1,10 @@
 package io.qtd.fungpt.auth.adapter.api.rest
 
+import io.ktor.http.*
 import io.qtd.fungpt.auth.adapter.api.dto.LoginUserRequest
 import io.qtd.fungpt.auth.adapter.api.dto.RefreshTokenRequest
 import io.qtd.fungpt.auth.adapter.api.dto.RegisterUserRequest
 import io.qtd.fungpt.auth.adapter.api.dto.UserCredentialsResponse
-import io.ktor.http.*
 import io.qtd.fungpt.common.adapter.bases.BaseResponse
 import io.qtd.fungpt.common.adapter.configs.ApiDoc
 import io.qtd.fungpt.common.adapter.configs.SWAGGER_SECURITY_SCHEMA
@@ -61,4 +61,17 @@ val logoutDoc: ApiDoc = {
         }
     }
     securitySchemeName = SWAGGER_SECURITY_SCHEMA
+}
+
+val deleteUserDoc: ApiDoc = {
+    description = "Delete user"
+    request {
+        pathParameter<String>("userId")
+    }
+    response {
+        HttpStatusCode.OK to {
+            class DeleteUserResponseType : BaseResponse<Any>()
+            body(DeleteUserResponseType::class)
+        }
+    }
 }

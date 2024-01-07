@@ -8,5 +8,6 @@ interface ProfilePort {
     suspend fun getAllProfiles(): List<CoreProfile>
 
     suspend fun createProfile(profile: CoreProfile): CoreProfile
+    suspend fun deleteProfile(profileId: String)
 }
 
