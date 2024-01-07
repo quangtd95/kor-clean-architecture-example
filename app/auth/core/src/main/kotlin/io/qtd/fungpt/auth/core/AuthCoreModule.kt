@@ -1,18 +1,23 @@
 package io.qtd.fungpt.auth.core
 
-import io.qtd.fungpt.auth.core.service.AuthService
-import io.qtd.fungpt.auth.core.usecase.AuthUsecase
+import io.qtd.fungpt.auth.core.services.AuthService
+import io.qtd.fungpt.auth.core.usecases.AuthUsecase
+import io.qtd.fungpt.common.core.bases.CoreModuleCreation
 import org.koin.dsl.module
 
-val authCoreKoinModule = module {
+class AuthCoreModuleCreation : CoreModuleCreation() {
+    override fun setupKoinModule() = module {
 
-    single<AuthUsecase> {
-        AuthService(
-            passwordService = get(),
-            tokenService = get(),
-            refreshTokenPort = get(),
-            userPort = get(),
-            txPort = get()
-        )
+        single<AuthUsecase> {
+            AuthService(
+                passwordChecker = get(),
+                tokenGenerator = get(),
+                refreshTokenPort = get(),
+                userPort = get(),
+                txPort = get(),
+                eventPublisherPort = get()
+            )
+        }
     }
+
 }

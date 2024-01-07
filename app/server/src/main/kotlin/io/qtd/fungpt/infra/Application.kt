@@ -5,25 +5,21 @@ import io.ktor.server.application.*
 import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.qtd.fungpt.auth.adapter.authAdapterKoinModule
-import io.qtd.fungpt.auth.adapter.persist.postgres.entity.PgRefreshTokens
-import io.qtd.fungpt.auth.adapter.persist.postgres.entity.PgUsers
-import io.qtd.fungpt.auth.adapter.preInitEsRepoAuthModule
-import io.qtd.fungpt.auth.core.authCoreKoinModule
-import io.qtd.fungpt.common.adapter.commonAdapterKoinModule
-import io.qtd.fungpt.common.adapter.config.PersistConfig
-import io.qtd.fungpt.common.adapter.config.PersistType
-import io.qtd.fungpt.common.adapter.database.ElasticsearchProvider
-import io.qtd.fungpt.common.core.commonCoreKoinModule
+import io.qtd.fungpt.auth.adapter.AuthAdapterModuleCreation
+import io.qtd.fungpt.auth.core.AuthCoreModuleCreation
+import io.qtd.fungpt.common.adapter.CommonAdapterModuleCreation
+import io.qtd.fungpt.common.core.CommonCoreModuleCreation
 import io.qtd.fungpt.common.core.database.BootPersistStoragePort
-import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.common.core.database.ShutdownPersistStoragePort
-import io.qtd.fungpt.infra.config.loadServerConfig
-import io.qtd.fungpt.user.adapter.userAdapterKoinModule
-import io.qtd.fungpt.user.core.userCoreKoinModule
+import io.qtd.fungpt.conversation.adapter.ConversationAdapterCreation
+import io.qtd.fungpt.conversation.core.ConversationCoreModuleCreation
+import io.qtd.fungpt.infra.configs.loadServerConfig
+import io.qtd.fungpt.profile.adapter.ProfileAdapterModuleCreation
+import io.qtd.fungpt.profile.core.ProfileCoreModuleCreation
+import io.qtd.fungpt.profile.core.events.NewProfileSubscriber
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.koin.core.logger.Level
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
@@ -31,44 +27,71 @@ import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 import org.slf4j.LoggerFactory
 
+private val logger = LoggerFactory.getLogger("Application")
+
+val adapterEntries = listOf(
+    CommonAdapterModuleCreation(),
+    AuthAdapterModuleCreation(),
+    ProfileAdapterModuleCreation(),
+    ConversationAdapterCreation()
+)
+
+val coreEntries = listOf(
+    CommonCoreModuleCreation(),
+    AuthCoreModuleCreation(),
+    ProfileCoreModuleCreation(),
+    ConversationCoreModuleCreation(),
+)
+
 fun main(args: Array<String>) {
     val hocon = HoconApplicationConfig(ConfigFactory.load())
     val serverConfig = loadServerConfig(hocon)
-    val logger = LoggerFactory.getLogger("Application")
 
     embeddedServer(Netty, port = serverConfig.port) {
         logger.info("Starting instance in port:${serverConfig.port}")
 
         installKoinModules { hocon }
         bootstrapPersistStorage()
+        eventSubscriberModule()
         module()
+
 
     }.start(wait = true)
 }
 
-private fun Application.installKoinModules(getHocon: () -> HoconApplicationConfig) {
+fun Application.module() {
+    adapterEntries.forEach {
+        it.setupRoutingAndPlugin(this)
+    }
+}
+
+fun Application.eventSubscriberModule() {
+    val newProfileSubscriber by inject<NewProfileSubscriber>()
+    val job = launch(Dispatchers.IO) {
+        newProfileSubscriber.subscribeUserEvents()
+    }
+    environment.monitor.subscribe(ApplicationStopped) {
+        logger.info("newProfileSubscriber is being shutdown...")
+        job.cancel()
+    }
+}
+
+private fun Application.installKoinModules(
+    getHocon: () -> HoconApplicationConfig,
+) {
     module {
         install(Koin) {
             slf4jLogger(level = Level.INFO)
             modules(
-                module {
-                    single { getHocon() }
-                },
-                commonCoreKoinModule,
-                commonAdapterKoinModule,
-
-                authCoreKoinModule,
-                authAdapterKoinModule,
-
-                userCoreKoinModule,
-                userAdapterKoinModule,
+                module { single { getHocon() } },
+                *(coreEntries.map { it.setupKoinModule() }).toTypedArray(),
+                *(adapterEntries.map { it.setupKoinModule() }).toTypedArray(),
             )
         }
     }
 }
 
 private fun Application.bootstrapPersistStorage() {
-    val logger = LoggerFactory.getLogger("Application")
     val shutdownStoragePort = inject<ShutdownPersistStoragePort>().value
     environment.monitor.subscribe(ApplicationStopped) {
         logger.info("ktor server is being shutdown...")
@@ -78,16 +101,9 @@ private fun Application.bootstrapPersistStorage() {
     val bootPersistStoragePort by inject<BootPersistStoragePort>()
     runBlocking(Dispatchers.IO) {
         bootPersistStoragePort.bootStorage {
-            val persistType = inject<PersistConfig>().value.persistType
-            when (persistType) {
-                PersistType.POSTGRES -> {
-                    SchemaUtils.create(PgUsers, PgRefreshTokens)
-                }
 
-                PersistType.ES -> {
-                    val esProvider = (inject<PersistTransactionPort>().value as ElasticsearchProvider)
-                    preInitEsRepoAuthModule(esProvider)
-                }
+            adapterEntries.forEach {
+                it.preInitDatabase()
             }
         }
     }

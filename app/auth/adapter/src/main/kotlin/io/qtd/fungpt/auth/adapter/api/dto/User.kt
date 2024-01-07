@@ -1,7 +1,7 @@
 package io.qtd.fungpt.auth.adapter.api.dto
 
-import io.qtd.fungpt.auth.core.model.CoreCredentials
-import io.qtd.fungpt.auth.core.model.CoreUser
+import io.qtd.fungpt.auth.core.models.CoreCredentials
+import io.qtd.fungpt.auth.core.models.CoreUser
 
 data class RegisterUserRequest(val user: RegisterUserDto) {
     data class RegisterUserDto(val email: String, val password: String) {
@@ -35,8 +35,6 @@ data class UserCredentialsResponse(val user: UserDto, val credentials: Credentia
     data class UserDto(
         val id: String,
         val email: String,
-        val bio: String?,
-        val image: String?,
     )
 
     data class CredentialsDto(
@@ -52,8 +50,6 @@ data class UserCredentialsResponse(val user: UserDto, val credentials: Credentia
                 UserDto(
                     id = user.id,
                     email = user.email,
-                    bio = user.bio,
-                    image = user.image,
                 ), CredentialsDto(
                     accessToken = credentials.accessToken,
                     accessTokenExpiredTime = credentials.accessTokenExpiredTime.toString(),

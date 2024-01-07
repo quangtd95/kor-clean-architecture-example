@@ -7,6 +7,7 @@ val ktEsVersion: String by rootProject
 val logbackVersion: String by rootProject
 val openaiClientVersion: String by rootProject
 val postgresqlVersion: String by rootProject
+val kafkaVersion: String by rootProject
 
 
 plugins {
@@ -26,6 +27,7 @@ dependencies {
     api("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     api("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     api("io.ktor:ktor-serialization-jackson:$ktorVersion")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     api("io.ktor:ktor-server-default-headers-jvm:$ktorVersion")
     api("io.ktor:ktor-server-cors-jvm:$ktorVersion")
     api("io.ktor:ktor-server-call-logging-jvm:$ktorVersion")
@@ -33,6 +35,10 @@ dependencies {
     api("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
     api("io.ktor:ktor-client-okhttp:$ktorVersion")
     api("io.ktor:ktor-server-call-id:$ktorVersion")
+    api("io.ktor:ktor-server-auth-jvm:$ktorVersion")
+    api("io.ktor:ktor-server-auth-jwt-jvm:$ktorVersion")
+    api("io.ktor:ktor-server-compression:$ktorVersion")
+
 
     // ------------------------exposed------------------------
     api("org.jetbrains.exposed:exposed-core:$exposedVersion")
@@ -55,4 +61,7 @@ dependencies {
 
     // ------------------------kotlin-search-client------------------------
     api("com.jillesvangurp:search-client:$ktEsVersion")
+
+    // ------------------------kotlin-kafka------------------------
+    api("io.github.nomisrev:kotlin-kafka:$kafkaVersion")
 }
