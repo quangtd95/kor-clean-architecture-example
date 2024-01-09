@@ -16,6 +16,7 @@ import io.qtd.fungpt.common.adapter.bases.BaseResponse.Companion.created
 import io.qtd.fungpt.common.adapter.bases.BaseResponse.Companion.success
 import io.qtd.fungpt.common.adapter.bases.baseRespond
 import io.qtd.fungpt.common.adapter.utils.Constants.JWT_AUTH
+import io.qtd.fungpt.common.adapter.utils.param
 import io.qtd.fungpt.common.adapter.utils.userId
 import org.koin.ktor.ext.inject
 
@@ -66,6 +67,10 @@ fun Route.auth() {
         authenticate(JWT_AUTH) {
             delete("/logout", logoutDoc) {
                 authService.logout(call.userId())
+                call.baseRespond(success())
+            }
+            delete("/{userId}", deleteUserDoc) {
+                authService.deleteUser(call.param("userId"))
                 call.baseRespond(success())
             }
         }

@@ -7,4 +7,6 @@ interface AuthUsecase {
     suspend fun login(email: String, password: String): CoreUserCredential
     suspend fun refresh(refreshToken: String): CoreUserCredential
     suspend fun logout(userId: String)
+
+    suspend fun deleteUser(userId: String)
 }

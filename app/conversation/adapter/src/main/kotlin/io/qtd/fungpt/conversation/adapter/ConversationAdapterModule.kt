@@ -3,12 +3,14 @@ package io.qtd.fungpt.conversation.adapter
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.qtd.fungpt.common.adapter.bases.AdapterModuleCreation
+import io.qtd.fungpt.common.adapter.bases.EventSubscriber
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider.IndexCreation
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
 import io.qtd.fungpt.conversation.adapter.api.rest.conversations
 import io.qtd.fungpt.conversation.adapter.api.rest.conversationsMessages
 import io.qtd.fungpt.conversation.adapter.chat.ChatBotAdapter
+import io.qtd.fungpt.conversation.adapter.events.UserDeletedEventsSubscriber
 import io.qtd.fungpt.conversation.adapter.persist.es.documents.EsConversations
 import io.qtd.fungpt.conversation.adapter.persist.es.documents.EsConversationsMessages
 import io.qtd.fungpt.conversation.adapter.persist.es.repositories.EsConversationMessageRepository
@@ -17,6 +19,7 @@ import io.qtd.fungpt.conversation.core.ports.ChatPort
 import io.qtd.fungpt.conversation.core.ports.ConversationMessagePort
 import io.qtd.fungpt.conversation.core.ports.ConversationPort
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.dsl.module
 
@@ -34,7 +37,7 @@ class ConversationAdapterCreation : KoinComponent, AdapterModuleCreation() {
         )
     }
 
-    override fun setupRoutingAndPlugin(app: Application) {
+    override fun setupApiAndPlugin(app: Application) {
         with(app) {
             routing {
                 route("/api") {
@@ -54,6 +57,17 @@ class ConversationAdapterCreation : KoinComponent, AdapterModuleCreation() {
         single<ChatPort> {
             ChatBotAdapter(get())
         }
+        single {
+            UserDeletedEventsSubscriber(
+                conversationUsecase = get()
+            )
+        }
 
+    }
+
+    override fun getEventSubscriber(): List<EventSubscriber> {
+        return listOf(
+            get<UserDeletedEventsSubscriber>()
+        )
     }
 }
