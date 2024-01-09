@@ -23,6 +23,7 @@ import io.qtd.fungpt.auth.core.ports.RefreshTokenPort
 import io.qtd.fungpt.auth.core.ports.TokenGeneratorPort
 import io.qtd.fungpt.auth.core.ports.UserPort
 import io.qtd.fungpt.common.adapter.bases.AdapterModuleCreation
+import io.qtd.fungpt.common.adapter.bases.EventSubscriber
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider
 import io.qtd.fungpt.common.adapter.databases.ElasticsearchProvider.IndexCreation
 import io.qtd.fungpt.common.adapter.databases.config.PersistConfig
@@ -45,7 +46,7 @@ class AuthAdapterModuleCreation : KoinComponent, AdapterModuleCreation() {
         }
     }
 
-    override fun setupRoutingAndPlugin(app: Application) {
+    override fun setupApiAndPlugin(app: Application) {
         with(app) {
             val jwtConfig by inject<JwtConfig>()
             val tokenJWTVerifier by inject<JWTVerifier>()
@@ -85,6 +86,8 @@ class AuthAdapterModuleCreation : KoinComponent, AdapterModuleCreation() {
             }
         }
     }
+
+    override fun getEventSubscriber(): List<EventSubscriber> = listOf()
 
     private fun preInitPostgresRepoAuthModule() {
         SchemaUtils.createMissingTablesAndColumns(PgUsers, PgRefreshTokens)

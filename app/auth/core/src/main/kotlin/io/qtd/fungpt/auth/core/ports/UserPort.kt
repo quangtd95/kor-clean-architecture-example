@@ -9,5 +9,6 @@ interface UserPort {
     suspend fun getByUserId(userId: String): CoreUser?
     suspend fun getByEmail(email: String): CoreUser?
     suspend fun getAllUsers(): List<CoreUser>
+    suspend fun deleteUser(userId: String)
 }
 

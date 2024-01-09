@@ -16,7 +16,6 @@ import io.qtd.fungpt.conversation.core.ConversationCoreModuleCreation
 import io.qtd.fungpt.infra.configs.loadServerConfig
 import io.qtd.fungpt.profile.adapter.ProfileAdapterModuleCreation
 import io.qtd.fungpt.profile.core.ProfileCoreModuleCreation
-import io.qtd.fungpt.profile.core.events.NewProfileSubscriber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -51,28 +50,33 @@ fun main(args: Array<String>) {
         logger.info("Starting instance in port:${serverConfig.port}")
 
         installKoinModules { hocon }
-        bootstrapPersistStorage()
-        eventSubscriberModule()
-        module()
-
+        bootstrapPersistStorages()
+        bootstrapEventSubscribers()
+        installApisAndPlugins()
 
     }.start(wait = true)
 }
 
-fun Application.module() {
+fun Application.installApisAndPlugins() {
     adapterEntries.forEach {
-        it.setupRoutingAndPlugin(this)
+        it.setupApiAndPlugin(this)
     }
 }
 
-fun Application.eventSubscriberModule() {
-    val newProfileSubscriber by inject<NewProfileSubscriber>()
-    val job = launch(Dispatchers.IO) {
-        newProfileSubscriber.subscribeUserEvents()
-    }
+fun Application.bootstrapEventSubscribers() {
+    val subscriberJobList = adapterEntries
+        .flatMap { it.getEventSubscriber() }
+        .map {
+            launch(Dispatchers.IO) {
+                it.startSubscriber()
+            }
+        }
+
     environment.monitor.subscribe(ApplicationStopped) {
         logger.info("newProfileSubscriber is being shutdown...")
-        job.cancel()
+        subscriberJobList.map {
+            it.cancel()
+        }
     }
 }
 
@@ -91,7 +95,7 @@ private fun Application.installKoinModules(
     }
 }
 
-private fun Application.bootstrapPersistStorage() {
+private fun Application.bootstrapPersistStorages() {
     val shutdownStoragePort = inject<ShutdownPersistStoragePort>().value
     environment.monitor.subscribe(ApplicationStopped) {
         logger.info("ktor server is being shutdown...")
