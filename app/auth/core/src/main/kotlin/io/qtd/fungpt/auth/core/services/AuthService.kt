@@ -3,11 +3,12 @@ package io.qtd.fungpt.auth.core.services
 import io.qtd.fungpt.auth.core.models.CoreUserCredential
 import io.qtd.fungpt.auth.core.ports.PasswordCheckerPort
 import io.qtd.fungpt.auth.core.ports.RefreshTokenPort
+import io.qtd.fungpt.auth.core.ports.TokenGeneratorPort
 import io.qtd.fungpt.auth.core.ports.UserPort
 import io.qtd.fungpt.auth.core.usecases.AuthUsecase
-import io.qtd.fungpt.auth.core.ports.TokenGeneratorPort
 import io.qtd.fungpt.common.core.database.PersistTransactionPort
-import io.qtd.fungpt.common.core.event.*
+import io.qtd.fungpt.common.core.event.EventPublisherPort
+import io.qtd.fungpt.common.core.event.UserEvent
 import io.qtd.fungpt.common.core.exception.LoginCredentialsInvalidException
 import io.qtd.fungpt.common.core.exception.RefreshTokenInvalidException
 import io.qtd.fungpt.common.core.exception.UserDoesNotExistsException
@@ -113,6 +114,18 @@ class AuthService(
     override suspend fun logout(userId: String) {
         txPort.withNewTransaction {
             refreshTokenPort.revokeAllTokens(userId)
+        }
+    }
+
+    override suspend fun deleteUser(userId: String) {
+        txPort.withNewTransaction {
+            userPort.deleteUser(userId)
+
+            eventPublisherPort.publish(
+                UserEvent.UserDeletedEvent(
+                    userId = userId
+                )
+            )
         }
     }
 }
